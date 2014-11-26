@@ -1,4 +1,4 @@
-package com.cloudbees.dockerpublish;
+package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
 import hudson.model.*;
