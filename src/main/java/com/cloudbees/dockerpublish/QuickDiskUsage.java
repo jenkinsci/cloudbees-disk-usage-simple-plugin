@@ -1,10 +1,6 @@
 package com.cloudbees.dockerpublish;
 
 import hudson.Extension;
-import hudson.Launcher;
-import hudson.console.ConsoleNote;
-import hudson.init.InitMilestone;
-import hudson.init.Initializer;
 import hudson.model.*;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.*;
@@ -13,7 +9,6 @@ import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
 import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;

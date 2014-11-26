@@ -1,4 +1,4 @@
-This is a silly simply disk usage thing. 
+This is a silly simple disk usage thing.
 
 When installed - it will use "du" command to estimate the size of jobs.
 It does this with ionice to ensure it doesn't use too much io, and one job dir at a time. 
