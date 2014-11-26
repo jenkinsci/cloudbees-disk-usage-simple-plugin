@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 @Extension
 @Singleton
-public class QuickDiskUsage implements UnprotectedRootAction {
+public class QuickDiskUsage extends ManagementLink {
 
 
     static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
@@ -97,14 +97,14 @@ public class QuickDiskUsage implements UnprotectedRootAction {
 
 
     public String getIconFileName() {
-        return null;
+        return "/plugin/disk-usage-simple/images/disk.png";
     }
 
 
 
 
     public String getDisplayName() {
-        return null;
+        return "Disk usage";
     }
 
     public String getUrlName() {
