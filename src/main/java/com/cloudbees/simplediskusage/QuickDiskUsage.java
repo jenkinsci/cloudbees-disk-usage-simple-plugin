@@ -8,6 +8,8 @@ import org.kohsuke.stapler.*;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -68,6 +70,7 @@ public class QuickDiskUsage extends ManagementLink {
                             return pathname.isDirectory();
                         }
                     });
+
                     duJob(lines, jobs);
                     self.currentLog = lines.toString();
                 } catch (Exception e) {
@@ -90,6 +93,7 @@ public class QuickDiskUsage extends ManagementLink {
                 lines.append(line + "\n");
             }
             stdOut.close();
+
             Thread.sleep(1000); //To keep load average nice and low
         }
         logger.info("Finished re-estimating disk usage.");
@@ -97,7 +101,7 @@ public class QuickDiskUsage extends ManagementLink {
 
 
     public String getIconFileName() {
-        return "/plugin/disk-usage-simple/images/disk.png";
+        return "/plugin/cloudbees-disk-usage-simple/images/disk.png";
     }
 
 

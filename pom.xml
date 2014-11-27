@@ -8,7 +8,7 @@
     <version>1.554.2</version><!-- which version of Jenkins is this plugin built against? -->
   </parent>
 
-  <artifactId>disk-usage-simple</artifactId>
+  <artifactId>cloudbees-disk-usage-simple</artifactId>
   <version>0.1-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
