@@ -104,15 +104,16 @@ public class QuickDiskUsage extends ManagementLink {
         return "/plugin/cloudbees-disk-usage-simple/images/disk.png";
     }
 
-
-
+    public String getDescription() {
+        return "Simple disk usage estimation";
+    }
 
     public String getDisplayName() {
         return "Disk usage";
     }
 
     public String getUrlName() {
-        return "disk-usage";
+        return "disk-usage-simple";
     }
 
 
