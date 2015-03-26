@@ -2,14 +2,14 @@ package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
 import hudson.model.*;
+import hudson.security.Permission;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.*;
 
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -25,6 +25,11 @@ import java.util.logging.Logger;
 public class QuickDiskUsage extends ManagementLink {
 
 
+    public static final String DISK_USAGE =
+            System.getProperty("os.name").toLowerCase().contains("mac")
+                    ? "du -khs" // OSX doesn't have ionice, this is only used during dev on my laptop
+                    : "ionice -c 3 du -khs";
+
     static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
@@ -36,22 +41,16 @@ public class QuickDiskUsage extends ManagementLink {
     String currentLog = "(not yet calculated, please try again soon)";
     long lastRun = 0;
 
-
-    /**
-     * This is accessed via: http://localhost:8080/jenkins/disk-usage
-     * This will walk the tree of jobs, and do something. Exploring api.
-     */
-    public HttpResponse doIndex(final StaplerRequest req, final @QueryParameter String job) throws IOException {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-
-        return new HttpResponse() {
-            public void generateResponse(StaplerRequest staplerRequest, StaplerResponse staplerResponse, Object o) throws IOException, ServletException {
-                fetchUsage(Jenkins.getInstance().getRootDir());
-                staplerResponse.getWriter().println(currentLog);
-            }
-        };
+    public String getDiskUsage() throws IOException {
+        fetchUsage(Jenkins.getInstance().getRootDir());
+        return currentLog;
     }
 
+
+    @Override
+    public Permission getRequiredPermission() {
+        return Jenkins.ADMINISTER;
+    }
 
     private void fetchUsage(final File rootDir) throws IOException {
         final QuickDiskUsage self = this;
@@ -64,14 +63,11 @@ public class QuickDiskUsage extends ManagementLink {
                 try {
                     StringBuffer lines = new StringBuffer();
 
-                    File dir = new File(rootDir, "jobs");
-                    File[] jobs = dir.listFiles(new FileFilter() {
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
+                    for (TopLevelItem item : Jenkins.getInstance().getAllItems(TopLevelItem.class)) {
+                        duJob(lines, item);
+                    }
+                    logger.info("Finished re-estimating disk usage.");
 
-                    duJob(lines, jobs);
                     self.currentLog = lines.toString();
                 } catch (Exception e) {
                     logger.log(Level.INFO, "Unable to run disk usage check", e);
@@ -82,21 +78,18 @@ public class QuickDiskUsage extends ManagementLink {
 
     }
 
-    private void duJob(StringBuffer lines, File[] jobs) throws IOException, InterruptedException {
-        for (File jobDir : jobs) {
-            logger.info("Estimating usage for: " + jobDir.getName());
-            Process p = Runtime.getRuntime().exec("ionice -c 3 du -khs", null, jobDir);
-            lines.append(jobDir.getName() + ": ");
-            String line;
-            BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream()));
-            while ((line = stdOut.readLine ()) != null) {
-                lines.append(line + "\n");
-            }
-            stdOut.close();
-
-            Thread.sleep(1000); //To keep load average nice and low
+    private void duJob(StringBuffer lines, TopLevelItem item) throws IOException, InterruptedException {
+        logger.info("Estimating usage for: " + item.getDisplayName());
+        Process p = Runtime.getRuntime().exec(DISK_USAGE, null, item.getRootDir());
+        lines.append(item.getDisplayName() + ": ");
+        String line;
+        BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream()));
+        while ((line = stdOut.readLine ()) != null) {
+            lines.append(line + "\n");
         }
-        logger.info("Finished re-estimating disk usage.");
+        stdOut.close();
+
+        Thread.sleep(1000); //To keep load average nice and low
     }
 
 
