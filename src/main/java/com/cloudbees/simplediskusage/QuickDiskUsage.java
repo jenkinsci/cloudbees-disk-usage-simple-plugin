@@ -56,6 +56,14 @@ public class QuickDiskUsage extends ManagementLink {
         return new Date(lastRun);
     }
 
+    public void doRefresh(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
+        lastRun = 0;
+        usage.clear();
+        fetchUsage(Jenkins.getInstance().getRootDir());
+        res.forwardToPreviousPage(req);
+    }
+
+
     @Override
     public Permission getRequiredPermission() {
         return Jenkins.ADMINISTER;

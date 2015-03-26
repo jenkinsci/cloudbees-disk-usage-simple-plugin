@@ -31,5 +31,6 @@ THE SOFTWARE.
   <l:side-panel>
       <l:task href="${rootURL}/" icon="icon-up icon-md" title="${%Back to Dashboard}"/>
       <l:task href="${rootURL}/manage" icon="icon-setting icon-md" title="${%Manage Jenkins}"/>
+      <l:task href="refresh" icon="icon-refresh icon-md" title="${%Refresh disk usage}"/>
   </l:side-panel>
 </j:jelly>
