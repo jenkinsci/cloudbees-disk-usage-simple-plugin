@@ -14,13 +14,21 @@
                     computed on ${date}
                 </j:otherwise>
             </j:choose>
-            <ul>
+            <table>
             <j:forEach var="e" items="${it.diskUsage}">
-                <li>
-                    <a href="${e.key.url}">${e.key.fullDisplayName}</a> : ${e.value}
-                </li>
+                <tr>
+                    <td>
+                        <a href="${e.key.url}">${e.key.fullDisplayName}</a>
+                    </td>
+                    <td>
+                        ${e.value} Kb
+                    </td>
+                    <td>
+                        <a href="clean/?job=${e.key.fullName}">clean</a>
+                    </td>
+                </tr>
             </j:forEach>
-            </ul>
+            </table>
             <div style="padding:10px; border: solid 1px #000; background: #cfc">
                 <h4>Tip</h4>
                 <p>

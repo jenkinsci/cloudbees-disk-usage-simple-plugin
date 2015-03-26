@@ -9,9 +9,11 @@ import org.kohsuke.stapler.*;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -29,8 +31,8 @@ public class QuickDiskUsage extends ManagementLink {
 
     public static final String DISK_USAGE =
             System.getProperty("os.name").toLowerCase().contains("mac")
-                    ? "du -khs" // OSX doesn't have ionice, this is only used during dev on my laptop
-                    : "ionice -c 3 du -khs";
+                    ? "du -ks" // OSX doesn't have ionice, this is only used during dev on my laptop
+                    : "ionice -c 3 du -ks";
 
     static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
         public Thread newThread(Runnable r) {
@@ -40,13 +42,24 @@ public class QuickDiskUsage extends ManagementLink {
         }
     });
 
-    Map<TopLevelItem, String> usage = new HashMap<TopLevelItem, String>();
+    Map<TopLevelItem, Long> usage = new HashMap<TopLevelItem, Long>();
     long lastRun = 0;
 
-    public Map<TopLevelItem, String> getDiskUsage() throws IOException {
+    public Map<TopLevelItem, Long> getDiskUsage() throws IOException {
         fetchUsage(Jenkins.getInstance().getRootDir());
-        return usage;
+        Map<TopLevelItem, Long> sorted =  new TreeMap<TopLevelItem, Long>(BY_NAME);
+        sorted.putAll(usage);
+        return sorted;
     }
+
+    private static Comparator<TopLevelItem> BY_NAME = new Comparator<TopLevelItem>() {
+        @Override
+        public int compare(TopLevelItem o1, TopLevelItem o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+        }
+    };
+
+
 
     public long getLastRun() {
         return lastRun;
@@ -60,6 +73,12 @@ public class QuickDiskUsage extends ManagementLink {
         lastRun = 0;
         usage.clear();
         fetchUsage(Jenkins.getInstance().getRootDir());
+        res.forwardToPreviousPage(req);
+    }
+
+    public void doClean(StaplerRequest req, StaplerResponse res) throws IOException, ServletException, InterruptedException {
+        Job job = Jenkins.getInstance().getItemByFullName(req.getParameter("job"), Job.class);
+        job.logRotate();
         res.forwardToPreviousPage(req);
     }
 
@@ -77,12 +96,10 @@ public class QuickDiskUsage extends ManagementLink {
         logger.info("Re-estimating disk usage");
         ex.execute(new Runnable() {
             public void run() {
-                Map<TopLevelItem, String> usage = new HashMap<TopLevelItem, String>();
+                Map<TopLevelItem, Long> usage = new HashMap<TopLevelItem, Long>();
                 try {
                     for (TopLevelItem item : Jenkins.getInstance().getAllItems(TopLevelItem.class)) {
-                        StringBuffer lines = new StringBuffer();
-                        duJob(lines, item);
-                        usage.put(item, lines.toString());
+                        usage.put(item, duJob(item));
                     }
                     logger.info("Finished re-estimating disk usage.");
                     QuickDiskUsage.this.usage = usage;
@@ -96,18 +113,17 @@ public class QuickDiskUsage extends ManagementLink {
 
     }
 
-    private void duJob(StringBuffer lines, TopLevelItem item) throws IOException, InterruptedException {
+    private long duJob(TopLevelItem item) throws IOException, InterruptedException {
         logger.info("Estimating usage for: " + item.getDisplayName());
         Process p = Runtime.getRuntime().exec(DISK_USAGE, null, item.getRootDir());
-        lines.append(item.getDisplayName() + ": ");
-        String line;
+        StringBuilder du = new StringBuilder();
         BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream()));
-        while ((line = stdOut.readLine ()) != null) {
-            lines.append(line + "\n");
-        }
-        stdOut.close();
+        String line = stdOut.readLine();
 
         Thread.sleep(1000); //To keep load average nice and low
+        if (line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() -2));
+        logger.log(Level.WARNING, "failed to parse `du` output : "+line);
+        return -1;
     }
 
 
