@@ -45,19 +45,19 @@ public class QuickDiskUsage extends ManagementLink {
         }
     });
 
-    Map<TopLevelItem, Long> usage = new HashMap<TopLevelItem, Long>();
+    Map<Job, Long> usage = new HashMap<Job, Long>();
     long lastRun = 0;
 
-    public Map<TopLevelItem, Long> getDiskUsage() throws IOException {
+    public Map<Job, Long> getDiskUsage() throws IOException {
         fetchUsage(Jenkins.getInstance().getRootDir());
-        Map<TopLevelItem, Long> sorted =  new TreeMap<TopLevelItem, Long>(BY_NAME);
+        Map<Job, Long> sorted =  new TreeMap<Job, Long>(BY_NAME);
         sorted.putAll(usage);
         return sorted;
     }
 
-    private static Comparator<TopLevelItem> BY_NAME = new Comparator<TopLevelItem>() {
+    private static Comparator<Job> BY_NAME = new Comparator<Job>() {
         @Override
-        public int compare(TopLevelItem o1, TopLevelItem o2) {
+        public int compare(Job o1, Job o2) {
             return o1.getFullName().compareTo(o2.getFullName());
         }
     };
@@ -99,10 +99,10 @@ public class QuickDiskUsage extends ManagementLink {
         logger.info("Re-estimating disk usage");
         ex.execute(new Runnable() {
             public void run() {
-                Map<TopLevelItem, Long> usage = new HashMap<TopLevelItem, Long>();
+                Map<Job, Long> usage = new HashMap<Job, Long>();
                 SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
                 try {
-                    for (TopLevelItem item : Jenkins.getInstance().getAllItems(TopLevelItem.class)) {
+                    for (Job item : Jenkins.getInstance().getAllItems(Job.class)) {
                         usage.put(item, duJob(item));
                     }
                     logger.info("Finished re-estimating disk usage.");
@@ -119,7 +119,7 @@ public class QuickDiskUsage extends ManagementLink {
 
     }
 
-    private long duJob(TopLevelItem item) throws IOException, InterruptedException {
+    private long duJob(Job item) throws IOException, InterruptedException {
         logger.info("Estimating usage for: " + item.getDisplayName());
         Process p = Runtime.getRuntime().exec(DISK_USAGE, null, item.getRootDir());
         StringBuilder du = new StringBuilder();
