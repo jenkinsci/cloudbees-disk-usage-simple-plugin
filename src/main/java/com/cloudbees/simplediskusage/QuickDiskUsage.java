@@ -2,8 +2,11 @@ package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
 import hudson.model.*;
+import hudson.security.ACL;
 import hudson.security.Permission;
 import jenkins.model.Jenkins;
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
 import org.kohsuke.stapler.*;
 
 import javax.inject.Singleton;
@@ -97,6 +100,7 @@ public class QuickDiskUsage extends ManagementLink {
         ex.execute(new Runnable() {
             public void run() {
                 Map<TopLevelItem, Long> usage = new HashMap<TopLevelItem, Long>();
+                SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
                 try {
                     for (TopLevelItem item : Jenkins.getInstance().getAllItems(TopLevelItem.class)) {
                         usage.put(item, duJob(item));
@@ -106,6 +110,8 @@ public class QuickDiskUsage extends ManagementLink {
 
                 } catch (Exception e) {
                     logger.log(Level.INFO, "Unable to run disk usage check", e);
+                } finally {
+                    SecurityContextHolder.setContext(impersonate);
                 }
                 lastRun = System.currentTimeMillis();
             }
