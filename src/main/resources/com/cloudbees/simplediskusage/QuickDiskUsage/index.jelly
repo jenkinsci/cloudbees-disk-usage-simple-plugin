@@ -1,12 +1,26 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:s="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:fmt="jelly:fmt" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:s="/lib/form">
     <l:layout title="${%Disk Usage}" norefresh="true">
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
             <h1>${%Disk Usage}</h1>
-            <pre>
-                ${it.diskUsage}
-            </pre>
+
+            <j:choose>
+                <j:when test="${it.lastRun == 0}">
+                    not yet calculated, please try again soon
+                </j:when>
+                <j:otherwise>
+                    <fmt:formatDate var="date" dateStyle="full" timeStyle="medium" value="${it.lastRunDate}"/>
+                    computed on ${date}
+                </j:otherwise>
+            </j:choose>
+            <ul>
+            <j:forEach var="e" items="${it.diskUsage}">
+                <li>
+                    <a href="${e.key.url}">${e.key.fullDisplayName}</a> : ${e.value}
+                </li>
+            </j:forEach>
+            </ul>
         </l:main-panel>
     </l:layout>
 </j:jelly>

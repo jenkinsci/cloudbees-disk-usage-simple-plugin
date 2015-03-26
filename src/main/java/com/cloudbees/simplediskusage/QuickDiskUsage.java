@@ -9,6 +9,8 @@ import org.kohsuke.stapler.*;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -38,14 +40,21 @@ public class QuickDiskUsage extends ManagementLink {
         }
     });
 
-    String currentLog = "(not yet calculated, please try again soon)";
+    Map<TopLevelItem, String> usage = new HashMap<TopLevelItem, String>();
     long lastRun = 0;
 
-    public String getDiskUsage() throws IOException {
+    public Map<TopLevelItem, String> getDiskUsage() throws IOException {
         fetchUsage(Jenkins.getInstance().getRootDir());
-        return currentLog;
+        return usage;
     }
 
+    public long getLastRun() {
+        return lastRun;
+    }
+
+    public Date getLastRunDate() {
+        return new Date(lastRun);
+    }
 
     @Override
     public Permission getRequiredPermission() {
@@ -60,15 +69,16 @@ public class QuickDiskUsage extends ManagementLink {
         logger.info("Re-estimating disk usage");
         ex.execute(new Runnable() {
             public void run() {
+                Map<TopLevelItem, String> usage = new HashMap<TopLevelItem, String>();
                 try {
-                    StringBuffer lines = new StringBuffer();
-
                     for (TopLevelItem item : Jenkins.getInstance().getAllItems(TopLevelItem.class)) {
+                        StringBuffer lines = new StringBuffer();
                         duJob(lines, item);
+                        usage.put(item, lines.toString());
                     }
                     logger.info("Finished re-estimating disk usage.");
+                    QuickDiskUsage.this.usage = usage;
 
-                    self.currentLog = lines.toString();
                 } catch (Exception e) {
                     logger.log(Level.INFO, "Unable to run disk usage check", e);
                 }
