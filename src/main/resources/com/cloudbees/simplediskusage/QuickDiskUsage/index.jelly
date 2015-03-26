@@ -5,7 +5,33 @@
         <l:main-panel>
             <h1>${%Disk Usage}</h1>
 
+
+
+            <table class="sortable pane bigtable">
+                <thead>
+                    <tr>
+                        <th>Item name</th>
+                        <th style="text-align: right">disk usage</th>
+                        <th style="text-align: right">cleanup</th>
+                    </tr>
+                </thead>
+            <j:forEach var="e" items="${it.diskUsage}">
+                <tr>
+                    <td>
+                        <a href="${e.key.url}">${e.key.fullDisplayName}</a>
+                    </td>
+                    <td style="text-align: right">
+                        ${e.value} Kb
+                    </td>
+                    <td style="text-align: right">
+                        <a href="clean/?job=${e.key.fullName}">run cleanup</a>
+                    </td>
+                </tr>
+            </j:forEach>
+            </table>
+
             <j:choose>
+                <p>
                 <j:when test="${it.lastRun == 0}">
                     not yet calculated, please try again soon
                 </j:when>
@@ -13,22 +39,9 @@
                     <fmt:formatDate var="date" dateStyle="full" timeStyle="medium" value="${it.lastRunDate}"/>
                     computed on ${date}
                 </j:otherwise>
+                </p>
             </j:choose>
-            <table>
-            <j:forEach var="e" items="${it.diskUsage}">
-                <tr>
-                    <td>
-                        <a href="${e.key.url}">${e.key.fullDisplayName}</a>
-                    </td>
-                    <td>
-                        ${e.value} Kb
-                    </td>
-                    <td>
-                        <a href="clean/?job=${e.key.fullName}">clean</a>
-                    </td>
-                </tr>
-            </j:forEach>
-            </table>
+
             <div style="padding:10px; border: solid 1px #000; background: #cfc">
                 <h4>Tip</h4>
                 <p>
