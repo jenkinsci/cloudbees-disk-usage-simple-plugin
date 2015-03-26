@@ -11,7 +11,7 @@
                 <thead>
                     <tr>
                         <th>Item name</th>
-                        <th style="text-align: right">disk usage</th>
+                        <th style="text-align: right">disk usage (Kb)</th>
                         <th style="text-align: right">cleanup</th>
                     </tr>
                 </thead>
@@ -21,7 +21,7 @@
                         <a href="${e.key.url}">${e.key.fullDisplayName}</a>
                     </td>
                     <td style="text-align: right">
-                        ${e.value} Kb
+                        ${e.value}
                     </td>
                     <td style="text-align: right">
                         <a href="clean/?job=${e.key.fullName}">run cleanup</a>
@@ -33,7 +33,7 @@
             <j:choose>
                 <p>
                 <j:when test="${it.lastRun == 0}">
-                    not yet calculated, please try again soon
+                    not yet calculated, please <a href=".">try again in few seconds</a>
                 </j:when>
                 <j:otherwise>
                     <fmt:formatDate var="date" dateStyle="full" timeStyle="medium" value="${it.lastRunDate}"/>
