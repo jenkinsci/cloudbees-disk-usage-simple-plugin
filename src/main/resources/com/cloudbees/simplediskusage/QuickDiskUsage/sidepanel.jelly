@@ -32,7 +32,14 @@ THE SOFTWARE.
       <l:task href="${rootURL}/" icon="icon-up icon-md" title="${%Back to Dashboard}"/>
       <l:task href="${rootURL}/manage" icon="icon-setting icon-md" title="${%Manage Jenkins}"/>
       <j:if test="${it.lastRun > 0}">
-        <l:task href="refresh" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
+        <l:task href="." onclick="return refresh(this)" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
+          <script>
+              function refresh(a) {
+                  new Ajax.Request("refresh");
+                  hoverNotification('${%Refresh scheduled}',a.parentNode);
+                  return true;
+              }
+          </script>
       </j:if>
   </l:side-panel>
 </j:jelly>
