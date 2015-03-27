@@ -18,7 +18,7 @@
             <j:forEach var="e" items="${it.diskUsage}">
                 <tr>
                     <td>
-                        <a href="${rootURL}/${e.key.url}" class="model-object">${e.key.fullDisplayName}</a>
+                        <a href="${rootURL}/${e.key.url}" class="model-link inside">${e.key.fullDisplayName}</a>
                     </td>
                     <td style="text-align: right">
                         ${e.value}
