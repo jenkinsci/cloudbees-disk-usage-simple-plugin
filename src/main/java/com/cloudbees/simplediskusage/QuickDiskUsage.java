@@ -1,15 +1,24 @@
 package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.*;
+import hudson.security.ACL;
+import hudson.security.Permission;
 import jenkins.model.Jenkins;
+import jenkins.util.Timer;
+import org.acegisecurity.context.SecurityContext;
+import org.acegisecurity.context.SecurityContextHolder;
 import org.kohsuke.stapler.*;
+import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -25,6 +34,11 @@ import java.util.logging.Logger;
 public class QuickDiskUsage extends ManagementLink {
 
 
+    public static final String DISK_USAGE =
+            System.getProperty("os.name").toLowerCase().contains("mac")
+                    ? "du -ks" // OSX doesn't have ionice, this is only used during dev on my laptop
+                    : "ionice -c 3 du -ks";
+
     static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
@@ -33,70 +47,78 @@ public class QuickDiskUsage extends ManagementLink {
         }
     });
 
-    String currentLog = "(not yet calculated, please try again soon)";
+    Map<DiskItem, Long> usage = new HashMap<>();
     long lastRun = 0;
 
-
-    /**
-     * This is accessed via: http://localhost:8080/jenkins/disk-usage
-     * This will walk the tree of jobs, and do something. Exploring api.
-     */
-    public HttpResponse doIndex(final StaplerRequest req, final @QueryParameter String job) throws IOException {
-        Jenkins.getInstance().checkPermission(Jenkins.ADMINISTER);
-
-        return new HttpResponse() {
-            public void generateResponse(StaplerRequest staplerRequest, StaplerResponse staplerResponse, Object o) throws IOException, ServletException {
-                fetchUsage(Jenkins.getInstance().getRootDir());
-                staplerResponse.getWriter().println(currentLog);
-            }
-        };
+    public Map<DiskItem, Long> getDiskUsage() throws IOException {
+        fetchUsage();
+        Map<DiskItem, Long> sorted =  new TreeMap<>(BY_NAME);
+        sorted.putAll(usage);
+        return sorted;
     }
 
+    private static Comparator<DiskItem> BY_NAME = new Comparator<DiskItem>() {
+        @Override
+        public int compare(DiskItem o1, DiskItem o2) {
+            return o1.getFullName().compareTo(o2.getFullName());
+        }
+    };
 
-    private void fetchUsage(final File rootDir) throws IOException {
-        final QuickDiskUsage self = this;
+    public long getLastRun() {
+        return lastRun;
+    }
+
+    public String getSince() {
+        return Util.getPastTimeString(System.currentTimeMillis() - lastRun);
+    }
+
+    @RequirePOST
+    public void doRefresh(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
+        lastRun = 0;
+        usage.clear();
+        fetchUsage();
+        res.forwardToPreviousPage(req);
+    }
+
+    @RequirePOST
+    public void doClean(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
+        final Job job = Jenkins.getInstance().getItemByFullName(req.getParameter("job"), Job.class);
+        Timer.get().submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    job.logRotate();
+                } catch (Exception e) {
+                    logger.log(Level.WARNING, "logRotate failed", e);
+                }
+            }
+        });
+        res.forwardToPreviousPage(req);
+    }
+
+    @Override
+    public Permission getRequiredPermission() {
+        return Jenkins.ADMINISTER;
+    }
+
+    private void fetchUsage() throws IOException {
         if (System.currentTimeMillis() - lastRun < 3 * 60 * 1000) {
             return;
         }
         logger.info("Re-estimating disk usage");
-        ex.execute(new Runnable() {
-            public void run() {
-                try {
-                    StringBuffer lines = new StringBuffer();
-
-                    File dir = new File(rootDir, "jobs");
-                    File[] jobs = dir.listFiles(new FileFilter() {
-                        public boolean accept(File pathname) {
-                            return pathname.isDirectory();
-                        }
-                    });
-
-                    duJob(lines, jobs);
-                    self.currentLog = lines.toString();
-                } catch (Exception e) {
-                    logger.log(Level.INFO, "Unable to run disk usage check", e);
-                }
-                lastRun = System.currentTimeMillis();
-            }
-        });
-
+        ex.execute(computeDiskUsage);
     }
 
-    private void duJob(StringBuffer lines, File[] jobs) throws IOException, InterruptedException {
-        for (File jobDir : jobs) {
-            logger.info("Estimating usage for: " + jobDir.getName());
-            Process p = Runtime.getRuntime().exec("ionice -c 3 du -khs", null, jobDir);
-            lines.append(jobDir.getName() + ": ");
-            String line;
-            BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream()));
-            while ((line = stdOut.readLine ()) != null) {
-                lines.append(line + "\n");
-            }
-            stdOut.close();
-
-            Thread.sleep(1000); //To keep load average nice and low
+    private long duJob(Job item) throws IOException, InterruptedException {
+        logger.info("Estimating usage for: " + item.getDisplayName());
+        Process p = Runtime.getRuntime().exec(DISK_USAGE, null, item.getRootDir());
+        StringBuilder du = new StringBuilder();
+        try (BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream())) ) {
+            String line = stdOut.readLine();
+            if (line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() -2));
+            logger.log(Level.WARNING, "failed to parse `du` output : "+line);
+            return -1;
         }
-        logger.info("Finished re-estimating disk usage.");
     }
 
 
@@ -119,4 +141,26 @@ public class QuickDiskUsage extends ManagementLink {
 
     private static final Logger logger = Logger.getLogger(QuickDiskUsage.class.getName());
 
+    private final Runnable computeDiskUsage = new Runnable() {
+        public void run() {
+            Map<DiskItem, Long> usage = new HashMap<>();
+            SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
+            try {
+                for (Job item : Jenkins.getInstance().getAllItems(Job.class)) {
+                    if (item instanceof TopLevelItem)
+                        usage.put(new DiskItem(item), duJob(item));
+
+                    Thread.sleep(1000); //To keep load average nice and low
+                }
+                logger.info("Finished re-estimating disk usage.");
+                QuickDiskUsage.this.usage = usage;
+
+            } catch (Exception e) {
+                logger.log(Level.INFO, "Unable to run disk usage check", e);
+            } finally {
+                SecurityContextHolder.setContext(impersonate);
+            }
+            lastRun = System.currentTimeMillis();
+        }
+    };
 }

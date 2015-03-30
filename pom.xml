@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.554.2</version><!-- which version of Jenkins is this plugin built against? -->
+    <version>1.580.3</version>
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
@@ -25,7 +25,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
 
   <scm>
     <connection>scm:git:git://github.com/jenkinsci/linux-disk-usage.git</connection>
@@ -47,19 +46,19 @@
     </pluginRepository>
   </pluginRepositories>
 
-  <dependencies>
-        <dependency>
-            <groupId>org.jenkins-ci.plugins</groupId>
-            <artifactId>token-macro</artifactId>
-            <version>1.10</version>
-        </dependency>
-    </dependencies>
-
   <build>
     <plugins>
       <plugin>
         <artifactId>maven-release-plugin</artifactId>
         <version>2.5</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.3</version>
+        <configuration>
+              <source>7</source>
+              <target>7</target>
+        </configuration>
       </plugin>
     </plugins>
   </build>
