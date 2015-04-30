@@ -17,7 +17,7 @@
   <description>
     This will use du to estimate job disk usage in an efficient way that doesn't slow down the host system.
   </description>
-  <url>https://github.com/jenkinsci/docker-build-publish-plugin/blob/master/README.md</url>
+
   <licenses>
     <license>
       <name>The MIT license</name>
