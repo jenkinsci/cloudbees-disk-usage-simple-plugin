@@ -33,7 +33,7 @@
             <j:choose>
                 <p>
                 <j:when test="${it.lastRun == 0}">
-                    not yet calculated, please <a href=".">try again in few seconds</a>
+                    not yet calculated, please <a href=".">try again in a few moments</a>
                 </j:when>
                 <j:otherwise>
                     computed ${it.since} ago
