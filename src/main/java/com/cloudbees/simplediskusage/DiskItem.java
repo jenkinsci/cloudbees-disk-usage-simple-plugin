@@ -20,6 +20,12 @@ public class DiskItem {
         this.url = job.getUrl();
     }
 
+    public DiskItem(String fullName, String displayName, String url) {
+        this.fullName = fullName;
+        this.displayName = displayName;
+        this.url = url;
+    }
+
     public String getFullName() {
         return fullName;
     }

@@ -18,13 +18,22 @@
             <j:forEach var="e" items="${it.diskUsage}">
                 <tr>
                     <td>
-                        <a href="${rootURL}/${e.key.url}" class="model-link inside">${e.key.fullDisplayName}</a>
+                        <j:choose>
+                            <j:when test="${e.key.url != null}">
+                                <a href="${rootURL}/${e.key.url}" class="model-link inside">${e.key.fullDisplayName}</a>
+                            </j:when>
+                            <j:otherwise>
+                                ${e.key.fullDisplayName}
+                            </j:otherwise>
+                        </j:choose>
                     </td>
                     <td style="text-align: right">
                         ${e.value}
                     </td>
                     <td style="text-align: right">
-                        <s:link href="clean/?job=${e.key.fullName}" post="true">run cleanup</s:link>
+                        <j:if test="${e.key.url != null}">
+                            <s:link href="clean/?job=${e.key.fullName}" post="true">run cleanup</s:link>
+                        </j:if>
                     </td>
                 </tr>
             </j:forEach>
