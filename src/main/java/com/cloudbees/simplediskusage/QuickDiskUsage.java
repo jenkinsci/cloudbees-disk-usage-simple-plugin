@@ -158,7 +158,7 @@ public class QuickDiskUsage extends ManagementLink {
                 File tmpDir = new File(System.getProperty("java.io.tmpdir"));
                 usage.put(new DiskItem(
                                 "java.io.tmpdir",
-                                "java.io.tmpdir (" + tmpDir.getAbsolutePath() + ")",
+                                "System temporary files (" + tmpDir.getAbsolutePath() + ")",
                                 null),
                         duDir(tmpDir));
                 logger.info("Finished re-estimating disk usage.");
