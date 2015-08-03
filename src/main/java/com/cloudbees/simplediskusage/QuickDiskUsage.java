@@ -111,7 +111,11 @@ public class QuickDiskUsage extends ManagementLink {
 
     private long duJob(Job item) throws IOException, InterruptedException {
         logger.info("Estimating usage for: " + item.getDisplayName());
-        Process p = Runtime.getRuntime().exec(DISK_USAGE, null, item.getRootDir());
+        return duDir(item.getRootDir());
+    }
+
+    private long duDir(File dir) throws IOException, InterruptedException {
+        Process p = Runtime.getRuntime().exec(DISK_USAGE, null, dir);
         StringBuilder du = new StringBuilder();
         try (BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream())) ) {
             String line = stdOut.readLine();
@@ -120,7 +124,6 @@ public class QuickDiskUsage extends ManagementLink {
             return -1;
         }
     }
-
 
     public String getIconFileName() {
         return "/plugin/cloudbees-disk-usage-simple/images/disk.png";
@@ -152,6 +155,12 @@ public class QuickDiskUsage extends ManagementLink {
 
                     Thread.sleep(1000); //To keep load average nice and low
                 }
+                File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+                usage.put(new DiskItem(
+                                "java.io.tmpdir",
+                                "System temporary files (" + tmpDir.getAbsolutePath() + ")",
+                                null),
+                        duDir(tmpDir));
                 logger.info("Finished re-estimating disk usage.");
                 QuickDiskUsage.this.usage = usage;
 
