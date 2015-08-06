@@ -11,7 +11,7 @@
                 <thead>
                     <tr>
                         <th>Item name</th>
-                        <th style="text-align: right">disk usage (KB)</th>
+                        <th style="text-align: right">disk usage (kB)</th>
                         <th style="text-align: right">cleanup</th>
                     </tr>
                 </thead>
