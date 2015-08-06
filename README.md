@@ -8,6 +8,3 @@ This also only runs a maximum of once every 3 minutes, and only when requested, 
 
 To use it /disk-usage.
 
-# Resources
-* Continuous Integration: [![Build Status](https://jenkins.ci.cloudbees.com/buildStatus/icon?job=plugins/cloudbees-disk-usage-simple-plugin)](https://jenkins.ci.cloudbees.com/job/plugins/cloudbees-disk-usage-simple-plugin)
-* Issues Tracking: [Jira](https://issues.jenkins-ci.org/browse/JENKINS/component/20652)
