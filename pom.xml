@@ -8,12 +8,13 @@
     <version>1.580.3</version>
   </parent>
 
-  <artifactId>cloudbees-disk-usage-simple-plugin</artifactId>
+  <artifactId>cloudbees-disk-usage-simple</artifactId>
   <version>0.3-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
   <name>CloudBees Disk Usage Simple Plugin</name>
   <description>This will use du to estimate job disk usage in an efficient way that doesn't slow down the host system</description>
+  <url>https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Simple+Disk+Usage+Plugin</url>
 
   <licenses>
     <license>
