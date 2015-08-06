@@ -8,7 +8,7 @@
     <version>1.580.3</version>
   </parent>
 
-  <artifactId>cloudbees-disk-usage-simple-plugin</artifactId>
+  <artifactId>cloudbees-disk-usage-simple</artifactId>
   <version>0.3-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
