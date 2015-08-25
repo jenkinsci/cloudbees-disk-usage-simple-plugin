@@ -116,7 +116,6 @@ public class QuickDiskUsage extends ManagementLink {
 
     private long duDir(File dir) throws IOException, InterruptedException {
         Process p = Runtime.getRuntime().exec(DISK_USAGE, null, dir);
-        StringBuilder du = new StringBuilder();
         try (BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream())) ) {
             String line = stdOut.readLine();
             if (line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() -2));
