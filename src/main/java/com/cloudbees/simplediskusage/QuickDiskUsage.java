@@ -110,7 +110,7 @@ public class QuickDiskUsage extends ManagementLink {
     }
 
     private long duJob(Job item) throws IOException, InterruptedException {
-        logger.info("Estimating usage for: " + item.getDisplayName());
+        logger.fine("Estimating usage for: " + item.getDisplayName());
         return duDir(item.getRootDir());
     }
 
