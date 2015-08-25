@@ -41,11 +41,14 @@
 
             <j:choose>
                 <p>
-                <j:when test="${it.lastRun == 0}">
-                    not yet calculated, please <a href=".">try again in a short while</a>
+                <j:when test="${it.lastRunStart == 0}">
+                    Not yet calculated, please <a href=".">try again in a short while</a>
+                </j:when>
+                <j:when test="${it.running}">
+                    Update in progress, please <a href=".">try again in a short while</a>
                 </j:when>
                 <j:otherwise>
-                    computed ${it.since} ago
+                    Computed ${it.since} ago. Took ${it.duration}.
                 </j:otherwise>
                 </p>
             </j:choose>

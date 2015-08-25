@@ -39,6 +39,8 @@ public class QuickDiskUsage extends ManagementLink {
                     ? "du -ks" // OSX doesn't have ionice, this is only used during dev on my laptop
                     : "ionice -c 3 du -ks";
 
+    public static final int QUIET_PERIOD = 3 * 60 * 1000;
+
     static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r);
@@ -48,10 +50,15 @@ public class QuickDiskUsage extends ManagementLink {
     });
 
     Map<DiskItem, Long> usage = new HashMap<>();
-    long lastRun = 0;
+    long lastRunStart = 0;
+    long lastRunEnd = 0;
 
     public Map<DiskItem, Long> getDiskUsage() throws IOException {
-        fetchUsage();
+        if (!isRunning() && System.currentTimeMillis() - lastRunEnd >= QUIET_PERIOD) {
+            // Let's launch an update
+            ex.execute(computeDiskUsage);
+        }
+
         Map<DiskItem, Long> sorted =  new TreeMap<>(BY_NAME);
         sorted.putAll(usage);
         return sorted;
@@ -64,19 +71,31 @@ public class QuickDiskUsage extends ManagementLink {
         }
     };
 
-    public long getLastRun() {
-        return lastRun;
+    public long getLastRunStart() {
+        return lastRunStart;
+    }
+
+    public long getLastRunEnd() {
+        return lastRunEnd;
     }
 
     public String getSince() {
-        return Util.getPastTimeString(System.currentTimeMillis() - lastRun);
+        return Util.getPastTimeString(System.currentTimeMillis() - lastRunEnd);
+    }
+
+    public String getDuration() {
+        return Util.getTimeSpanString(lastRunEnd - lastRunStart);
+    }
+
+    public boolean isRunning() {
+        return lastRunEnd < lastRunStart;
     }
 
     @RequirePOST
     public void doRefresh(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
-        lastRun = 0;
-        usage.clear();
-        fetchUsage();
+        if (!isRunning()) {
+            ex.execute(computeDiskUsage);
+        }
         res.forwardToPreviousPage(req);
     }
 
@@ -99,14 +118,6 @@ public class QuickDiskUsage extends ManagementLink {
     @Override
     public Permission getRequiredPermission() {
         return Jenkins.ADMINISTER;
-    }
-
-    private void fetchUsage() throws IOException {
-        if (System.currentTimeMillis() - lastRun < 3 * 60 * 1000) {
-            return;
-        }
-        logger.info("Re-estimating disk usage");
-        ex.execute(computeDiskUsage);
     }
 
     private long duJob(Job item) throws IOException, InterruptedException {
@@ -145,6 +156,8 @@ public class QuickDiskUsage extends ManagementLink {
 
     private final Runnable computeDiskUsage = new Runnable() {
         public void run() {
+            logger.info("Re-estimating disk usage");
+            lastRunStart = System.currentTimeMillis();
             Map<DiskItem, Long> usage = new HashMap<>();
             SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
             try {
@@ -162,13 +175,13 @@ public class QuickDiskUsage extends ManagementLink {
                         duDir(tmpDir));
                 logger.info("Finished re-estimating disk usage.");
                 QuickDiskUsage.this.usage = usage;
-
+                lastRunEnd = System.currentTimeMillis();
             } catch (Exception e) {
                 logger.log(Level.INFO, "Unable to run disk usage check", e);
+                lastRunEnd = lastRunStart;
             } finally {
                 SecurityContextHolder.setContext(impersonate);
             }
-            lastRun = System.currentTimeMillis();
         }
     };
 }
