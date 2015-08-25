@@ -39,7 +39,7 @@ public class QuickDiskUsage extends ManagementLink {
                     ? "du -ks" // OSX doesn't have ionice, this is only used during dev on my laptop
                     : "ionice -c 3 du -ks";
 
-    public static final int QUIET_PERIOD = 3 * 60 * 1000;
+    public static final int QUIET_PERIOD = 15 * 60 * 1000;
 
     static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
         public Thread newThread(Runnable r) {
