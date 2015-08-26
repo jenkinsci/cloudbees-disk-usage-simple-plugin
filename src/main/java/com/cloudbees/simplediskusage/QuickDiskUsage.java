@@ -102,17 +102,20 @@ public class QuickDiskUsage extends ManagementLink {
 
     @RequirePOST
     public void doClean(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
-        final Job job = Jenkins.getInstance().getItemByFullName(req.getParameter("job"), Job.class);
-        Timer.get().submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    job.logRotate();
-                } catch (Exception e) {
-                    logger.log(Level.WARNING, "logRotate failed", e);
+        Jenkins jenkins = Jenkins.getInstance();
+        if(jenkins != null){
+            final Job job = jenkins.getItemByFullName(req.getParameter("job"), Job.class);
+            Timer.get().submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        job.logRotate();
+                    } catch (Exception e) {
+                        logger.log(Level.WARNING, "logRotate failed", e);
+                    }
                 }
-            }
-        });
+            });
+        }
         res.forwardToPreviousPage(req);
     }
 
@@ -161,27 +164,30 @@ public class QuickDiskUsage extends ManagementLink {
             lastRunStart = System.currentTimeMillis();
             Map<DiskItem, Long> usage = new HashMap<>();
             SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
-            try {
-                for (Job item : Jenkins.getInstance().getAllItems(Job.class)) {
-                    if (item instanceof TopLevelItem)
-                        usage.put(new DiskItem(item), duJob(item));
+            Jenkins jenkins = Jenkins.getInstance();
+            if(jenkins != null){
+                try {
+                    for (Job item : jenkins.getAllItems(Job.class)) {
+                        if (item instanceof TopLevelItem)
+                            usage.put(new DiskItem(item), duJob(item));
 
-                    Thread.sleep(1000); //To keep load average nice and low
+                        Thread.sleep(1000); //To keep load average nice and low
+                    }
+                    File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+                    usage.put(new DiskItem(
+                                    "java.io.tmpdir",
+                                    "System temporary files (" + tmpDir.getAbsolutePath() + ")",
+                                    null),
+                            duDir(tmpDir));
+                    logger.info("Finished re-estimating disk usage.");
+                    QuickDiskUsage.this.usage = usage;
+                    lastRunEnd = System.currentTimeMillis();
+                } catch (Exception e) {
+                    logger.log(Level.INFO, "Unable to run disk usage check", e);
+                    lastRunEnd = lastRunStart;
+                } finally {
+                    SecurityContextHolder.setContext(impersonate);
                 }
-                File tmpDir = new File(System.getProperty("java.io.tmpdir"));
-                usage.put(new DiskItem(
-                                "java.io.tmpdir",
-                                "System temporary files (" + tmpDir.getAbsolutePath() + ")",
-                                null),
-                        duDir(tmpDir));
-                logger.info("Finished re-estimating disk usage.");
-                QuickDiskUsage.this.usage = usage;
-                lastRunEnd = System.currentTimeMillis();
-            } catch (Exception e) {
-                logger.log(Level.INFO, "Unable to run disk usage check", e);
-                lastRunEnd = lastRunStart;
-            } finally {
-                SecurityContextHolder.setContext(impersonate);
             }
         }
     };
