@@ -130,7 +130,7 @@ public class QuickDiskUsage extends ManagementLink {
         Process p = Runtime.getRuntime().exec(DISK_USAGE, null, dir);
         try (BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream(), Charset.defaultCharset().name())) ) {
             String line = stdOut.readLine();
-            if (line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() -2));
+            if (line != null && line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() -2));
             logger.log(Level.WARNING, "failed to parse `du` output : "+line);
             return -1;
         }
