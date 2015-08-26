@@ -15,6 +15,7 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -127,7 +128,7 @@ public class QuickDiskUsage extends ManagementLink {
 
     private long duDir(File dir) throws IOException, InterruptedException {
         Process p = Runtime.getRuntime().exec(DISK_USAGE, null, dir);
-        try (BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream())) ) {
+        try (BufferedReader stdOut = new BufferedReader (new InputStreamReader(p.getInputStream(), Charset.defaultCharset().name())) ) {
             String line = stdOut.readLine();
             if (line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() -2));
             logger.log(Level.WARNING, "failed to parse `du` output : "+line);
