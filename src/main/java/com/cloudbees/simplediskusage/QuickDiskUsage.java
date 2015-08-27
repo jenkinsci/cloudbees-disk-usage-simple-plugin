@@ -20,6 +20,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -50,7 +51,7 @@ public class QuickDiskUsage extends ManagementLink {
         }
     });
 
-    Map<DiskItem, Long> usage = new HashMap<>();
+    Map<DiskItem, Long> usage = new ConcurrentHashMap<>();
     long lastRunStart = 0;
     long lastRunEnd = 0;
 
@@ -162,11 +163,16 @@ public class QuickDiskUsage extends ManagementLink {
         public void run() {
             logger.info("Re-estimating disk usage");
             lastRunStart = System.currentTimeMillis();
-            Map<DiskItem, Long> usage = new HashMap<>();
             SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
             Jenkins jenkins = Jenkins.getInstance();
             if(jenkins != null){
                 try {
+                    // Remove useless entries
+                    for (DiskItem item:usage.keySet()){
+                        if(!item.getPath().exists()){
+                            usage.remove(item);
+                        }
+                    }
                     for (Job item : jenkins.getAllItems(Job.class)) {
                         if (item instanceof TopLevelItem)
                             usage.put(new DiskItem(item), duJob(item));
@@ -177,10 +183,10 @@ public class QuickDiskUsage extends ManagementLink {
                     usage.put(new DiskItem(
                                     "java.io.tmpdir",
                                     "System temporary files (" + tmpDir.getAbsolutePath() + ")",
-                                    null),
+                                    null,
+                                    tmpDir),
                             duDir(tmpDir));
                     logger.info("Finished re-estimating disk usage.");
-                    QuickDiskUsage.this.usage = usage;
                     lastRunEnd = System.currentTimeMillis();
                 } catch (Exception e) {
                     logger.log(Level.INFO, "Unable to run disk usage check", e);
