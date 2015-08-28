@@ -69,7 +69,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     private static Comparator<DiskItem> BY_NAME = new Comparator<DiskItem>() {
         @Override
         public int compare(DiskItem o1, DiskItem o2) {
-            return o1.getFullName().compareTo(o2.getFullName());
+            return o1.getFullDisplayName().compareToIgnoreCase(o2.getFullDisplayName());
         }
     };
 
@@ -165,6 +165,28 @@ public class QuickDiskUsagePlugin extends Plugin {
                                     null,
                                     tmpDir),
                             duDir(tmpDir));
+                    // Display JENKINS_HOME size
+                    File jenkinsHomeDir = jenkins.getRootDir();
+                    usage.put(new DiskItem(
+                                    "JENKINS_HOME",
+                                    "JENKINS_HOME",
+                                    null,
+                                    jenkinsHomeDir),
+                            duDir(jenkinsHomeDir));
+                    // Display JENKINS_HOME first level sub-directories sizes when non-empty
+                    for (File child : jenkinsHomeDir.listFiles()) {
+                        if (child.isDirectory()) {
+                            long size = duDir(child);
+                            if (size > 0) {
+                                usage.put(new DiskItem(
+                                                "JENKINS_HOME » " + child.getName(),
+                                                "JENKINS_HOME » " + child.getName(),
+                                                null,
+                                                child),
+                                        size);
+                            }
+                        }
+                    }
                     logger.info("Finished re-estimating disk usage.");
                     lastRunEnd = System.currentTimeMillis();
                 } catch (Exception e) {

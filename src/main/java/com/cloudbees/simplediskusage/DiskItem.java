@@ -20,7 +20,7 @@ public class DiskItem {
 
     public DiskItem(Job job) {
         this.fullName = job.getFullName();
-        this.displayName = job.getFullDisplayName();
+        this.displayName = "JENKINS_HOME » jobs » "+job.getFullDisplayName();
         this.url = job.getUrl();
         this.path = job.getRootDir();
     }
