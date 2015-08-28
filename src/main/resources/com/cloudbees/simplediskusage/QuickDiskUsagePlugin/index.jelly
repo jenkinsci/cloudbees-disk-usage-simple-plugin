@@ -5,7 +5,19 @@
         <l:main-panel>
             <h1>${%Disk Usage}</h1>
 
-
+            <j:choose>
+                <p>
+                    <j:when test="${it.lastRunStart == 0}">
+                        <strong>Not yet calculated</strong>, please <a href=".">try again in a short while</a>
+                    </j:when>
+                    <j:when test="${it.running}">
+                        <strong>Update in progress</strong>, please <a href=".">try again in a short while</a>
+                    </j:when>
+                    <j:otherwise>
+                        Computed ${it.since} ago. Took ${it.duration}.
+                    </j:otherwise>
+                </p>
+            </j:choose>
 
             <table class="sortable pane bigtable">
                 <thead>
@@ -38,21 +50,7 @@
                 </tr>
             </j:forEach>
             </table>
-
-            <j:choose>
-                <p>
-                <j:when test="${it.lastRunStart == 0}">
-                    Not yet calculated, please <a href=".">try again in a short while</a>
-                </j:when>
-                <j:when test="${it.running}">
-                    Update in progress, please <a href=".">try again in a short while</a>
-                </j:when>
-                <j:otherwise>
-                    Computed ${it.since} ago. Took ${it.duration}.
-                </j:otherwise>
-                </p>
-            </j:choose>
-
+            <p></p>
             <div style="padding:10px; border: solid 1px #000; background: #cfc">
                 <h4>Tip</h4>
                 <p>
