@@ -51,12 +51,16 @@ public class QuickDiskUsagePlugin extends Plugin {
     long lastRunStart = 0;
     long lastRunEnd = 0;
 
-    public Map<DiskItem, Long> getDiskUsage() throws IOException {
-        if (!isRunning() && System.currentTimeMillis() - lastRunEnd >= QUIET_PERIOD) {
-            // Let's launch an update
+    public void refreshData(){
+        if (!isRunning()) {
             ex.execute(computeDiskUsage);
         }
+    }
 
+    public Map<DiskItem, Long> getDiskUsage() throws IOException {
+        if (System.currentTimeMillis() - lastRunEnd >= QUIET_PERIOD) {
+            refreshData();
+        }
         Map<DiskItem, Long> sorted =  new TreeMap<>(BY_NAME);
         sorted.putAll(usage);
         return sorted;
@@ -91,9 +95,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     @RequirePOST
     public void doRefresh(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
-        if (!isRunning()) {
-            ex.execute(computeDiskUsage);
-        }
+        refreshData();
         res.forwardToPreviousPage(req);
     }
 
