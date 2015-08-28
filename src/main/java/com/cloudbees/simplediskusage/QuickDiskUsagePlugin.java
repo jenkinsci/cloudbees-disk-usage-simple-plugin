@@ -1,10 +1,10 @@
 package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
+import hudson.Plugin;
 import hudson.Util;
 import hudson.model.*;
 import hudson.security.ACL;
-import hudson.security.Permission;
 import jenkins.model.Jenkins;
 import jenkins.util.Timer;
 import org.acegisecurity.context.SecurityContext;
@@ -17,7 +17,6 @@ import javax.servlet.ServletException;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,12 +27,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
-/**
- * Expose endpoint for nagios to hit for monitoring the health of this instance.
- */
 @Extension
 @Singleton
-public class QuickDiskUsage extends ManagementLink {
+public class QuickDiskUsagePlugin extends Plugin {
 
 
     public static final String DISK_USAGE =
@@ -120,10 +116,6 @@ public class QuickDiskUsage extends ManagementLink {
         res.forwardToPreviousPage(req);
     }
 
-    @Override
-    public Permission getRequiredPermission() {
-        return Jenkins.ADMINISTER;
-    }
 
     private long duJob(Job item) throws IOException, InterruptedException {
         logger.fine("Estimating usage for: " + item.getDisplayName());
@@ -140,24 +132,9 @@ public class QuickDiskUsage extends ManagementLink {
         }
     }
 
-    public String getIconFileName() {
-        return "/plugin/cloudbees-disk-usage-simple/images/disk.png";
-    }
-
-    public String getDescription() {
-        return "Simple disk usage estimation";
-    }
-
-    public String getDisplayName() {
-        return "Disk usage";
-    }
-
-    public String getUrlName() {
-        return "disk-usage-simple";
-    }
 
 
-    private static final Logger logger = Logger.getLogger(QuickDiskUsage.class.getName());
+    private static final Logger logger = Logger.getLogger(QuickDiskUsagePlugin.class.getName());
 
     private final Runnable computeDiskUsage = new Runnable() {
         public void run() {
@@ -197,4 +174,5 @@ public class QuickDiskUsage extends ManagementLink {
             }
         }
     };
+
 }
