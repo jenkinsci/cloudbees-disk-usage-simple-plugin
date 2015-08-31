@@ -192,7 +192,7 @@ public class QuickDiskUsagePlugin extends Plugin {
                     }
                     logger.info("Finished re-estimating disk usage.");
                     lastRunEnd = System.currentTimeMillis();
-                } catch (Exception e) {
+                } catch (IOException | InterruptedException e) {
                     logger.log(Level.INFO, "Unable to run disk usage check", e);
                     lastRunEnd = lastRunStart;
                 } finally {
