@@ -174,16 +174,19 @@ public class QuickDiskUsagePlugin extends Plugin {
                                     jenkinsHomeDir),
                             duDir(jenkinsHomeDir));
                     // Display JENKINS_HOME first level sub-directories sizes when non-empty
-                    for (File child : jenkinsHomeDir.listFiles()) {
-                        if (child.isDirectory()) {
-                            long size = duDir(child);
-                            if (size > 0) {
-                                usage.put(new DiskItem(
-                                                "JENKINS_HOME » " + child.getName(),
-                                                "JENKINS_HOME » " + child.getName(),
-                                                null,
-                                                child),
-                                        size);
+                    File[] jenkinsHomeRootDirectories = jenkinsHomeDir.listFiles();
+                    if (jenkinsHomeRootDirectories != null) {
+                        for (File child : jenkinsHomeRootDirectories) {
+                            if (child.isDirectory()) {
+                                long size = duDir(child);
+                                if (size > 0) {
+                                    usage.put(new DiskItem(
+                                                    "JENKINS_HOME » " + child.getName(),
+                                                    "JENKINS_HOME » " + child.getName(),
+                                                    null,
+                                                    child),
+                                            size);
+                                }
                             }
                         }
                     }
