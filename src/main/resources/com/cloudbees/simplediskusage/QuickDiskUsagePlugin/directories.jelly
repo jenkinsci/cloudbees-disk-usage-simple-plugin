@@ -1,6 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
-    <l:layout title="${%Disk Usage}" norefresh="true" permission="${app.ADMINISTER}">
+    <l:layout title="${%Disk Usage}" permission="${app.ADMINISTER}">
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
             <h1>${%Disk Usage}</h1>
