@@ -31,6 +31,7 @@ THE SOFTWARE.
   <l:side-panel>
       <l:task href="${rootURL}/" icon="icon-up icon-md" title="${%Back to Dashboard}"/>
       <l:task href="${rootURL}/manage" icon="icon-setting icon-md" title="${%Manage Jenkins}"/>
+      <l:task href="." icon="/plugin/cloudbees-disk-usage-simple/images/disk.png" title="${%Disk usage}"/>
       <j:if test="${not it.running}">
         <l:task href="." onclick="return refresh(this)" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
           <script>
