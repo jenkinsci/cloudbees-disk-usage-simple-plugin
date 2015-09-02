@@ -1,54 +1,37 @@
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:fmt="jelly:fmt" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:s="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:s="/lib/form">
     <l:layout title="${%Disk Usage}" norefresh="true" permission="${app.ADMINISTER}">
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
             <h1>${%Disk Usage}</h1>
-
-            <j:choose>
-                <p>
-                    <j:when test="${it.lastRunStart == 0}">
-                        <strong>Not yet calculated</strong>, please <a href=".">try again in a short while</a>
-                    </j:when>
-                    <j:when test="${it.running}">
-                        <strong>Update in progress</strong>, please <a href=".">try again in a short while</a>
-                    </j:when>
-                    <j:otherwise>
-                        Computed ${it.since} ago. Took ${it.duration}.
-                    </j:otherwise>
-                </p>
-            </j:choose>
-
+            <st:include page="message.jelly" />
+            <l:tabBar>
+                <l:tab name="${%Jobs}" active="true" href="."/>
+                <l:tab name="${%Directories}" href="./directories"/>
+            </l:tabBar>
             <table class="sortable pane bigtable">
                 <thead>
                     <tr>
-                        <th>Item name</th>
-                        <th style="text-align: right">disk usage (kB)</th>
-                        <th style="text-align: right">cleanup</th>
+                        <th class="pane-header" initialSortDir="down">${%Item name}</th>
+                        <th class="pane-header" style="text-align: right">${%Disk usage} (kB)</th>
+                        <th class="pane-header" style="text-align: right">${%Action}</th>
                     </tr>
                 </thead>
-            <j:forEach var="e" items="${it.diskUsage}">
-                <tr>
-                    <td>
-                        <j:choose>
-                            <j:when test="${e.key.url != null}">
-                                <a href="${rootURL}/${e.key.url}" class="model-link inside">${e.key.fullDisplayName}</a>
-                            </j:when>
-                            <j:otherwise>
-                                ${e.key.fullDisplayName}
-                            </j:otherwise>
-                        </j:choose>
-                    </td>
-                    <td style="text-align: right">
-                        ${e.value}
-                    </td>
-                    <td style="text-align: right">
-                        <j:if test="${e.key.url != null}">
-                            <s:link href="clean/?job=${e.key.fullName}" post="true">run cleanup</s:link>
-                        </j:if>
-                    </td>
-                </tr>
-            </j:forEach>
+                <tbody>
+                    <j:forEach var="e" items="${it.jobsUsages}">
+                        <tr>
+                            <td class="pane">
+                                <a href="${rootURL}/${e.url}" class="model-link inside">${e.displayName}</a>
+                            </td>
+                            <td class="pane" style="text-align: right">
+                                ${e.usage}
+                            </td>
+                            <td class="pane" style="text-align: right">
+                                <s:link href="clean/?job=${e.fullName}" post="true">run cleanup</s:link>
+                            </td>
+                        </tr>
+                    </j:forEach>
+                </tbody>
             </table>
             <p></p>
             <div style="padding:10px; border: solid 1px #000; background: #cfc">
@@ -61,7 +44,7 @@
                 <p>
                     Job can be configured with "<em>Discard Old Builds</em>" option to only keep x build in history
                     (or keep them for max N days), but a better option is to open advanced section for this option
-                    and to configure "<em>Max # of builds to keep with artifacts</em>". The 'clean' link in upper disk
+                    and to configure "<em>Max # of builds to keep with artifacts</em>". The 'run cleanup' link in upper disk
                     usage list do run this exact purge operation.
                 </p>
             </div>

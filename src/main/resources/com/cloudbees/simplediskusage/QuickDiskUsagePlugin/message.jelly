@@ -1,0 +1,20 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core">
+    <p>
+        <j:choose>
+            <j:when test="${it.lastRunStart == 0}">
+                <strong>Not yet calculated</strong>, please
+                <a href=".">try again in a short while</a>
+            </j:when>
+            <j:when test="${it.running}">
+                <strong>Update in progress</strong>, please
+                <a href=".">try again in a short while</a>
+            </j:when>
+            <j:otherwise>
+                Computed ${it.since} ago. Took ${it.duration}.
+            </j:otherwise>
+        </j:choose>
+    </p>
+</j:jelly>
+
+

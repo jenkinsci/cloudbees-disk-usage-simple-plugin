@@ -1,66 +1,57 @@
 package com.cloudbees.simplediskusage;
 
-import hudson.model.Job;
-
 import java.io.File;
+import java.util.Objects;
 
 /**
- * Some Jenkins item which do consume disk
+ * A directory path on the disk with its usage information
+ *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
-public class DiskItem {
+public class DiskItem implements Comparable<DiskItem> {
 
-    private final String fullName;
+    final String displayName;
 
-    private final String displayName;
+    final File path;
 
-    private final String url;
+    final Long usage;
 
-    private final File path;
-
-    public DiskItem(Job job) {
-        this.fullName = job.getFullName();
-        this.displayName = "JENKINS_HOME » jobs » "+job.getFullDisplayName();
-        this.url = job.getUrl();
-        this.path = job.getRootDir();
-    }
-
-    public DiskItem(String fullName, String displayName, String url, File path) {
-        this.fullName = fullName;
+    public DiskItem(String displayName, File path, Long usage) {
         this.displayName = displayName;
-        this.url = url;
         this.path = path;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public String getFullDisplayName() {
-        return displayName;
-    }
-
-    public String getUrl() {
-        return url;
+        this.usage = usage;
     }
 
     public File getPath() {
         return path;
     }
 
+    public Long getUsage() {
+        return usage;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    @Override
+    public int compareTo(DiskItem o) {
+        return Objects.compare(
+                getDisplayName() != null ? getDisplayName() : "",
+                o != null && o.getDisplayName() != null ? o.getDisplayName() : "",
+                String.CASE_INSENSITIVE_ORDER);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         DiskItem diskItem = (DiskItem) o;
-
-        return path.equals(diskItem.path);
-
+        return Objects.equals(getPath(), diskItem.getPath());
     }
 
     @Override
     public int hashCode() {
-        return path.hashCode();
+        return Objects.hash(getPath());
     }
 }
