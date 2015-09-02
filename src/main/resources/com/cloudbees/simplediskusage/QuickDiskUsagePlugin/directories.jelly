@@ -1,9 +1,9 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
-    <l:layout title="${%Disk Usage}" permission="${app.ADMINISTER}">
+    <l:layout title="${%Disk usage}" permission="${app.ADMINISTER}">
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
-            <h1>${%Disk Usage}</h1>
+            <h1>${%Disk usage}</h1>
             <st:include page="message.jelly" />
             <l:tabBar>
                 <l:tab name="${%Jobs}" href="."/>
