@@ -164,8 +164,8 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     private long duDir(File path) throws IOException, InterruptedException {
-        logger.fine("Estimating usage for: " + path.getAbsolutePath());
         if (path == null || !path.exists() || !path.isDirectory()) return -1;
+        logger.fine("Estimating usage for: " + path.getAbsolutePath());
         Process p = Runtime.getRuntime().exec(DISK_USAGE, null, path);
         try (BufferedReader stdOut = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset().name()))) {
             String line = stdOut.readLine();
