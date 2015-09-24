@@ -251,8 +251,8 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
 
         // Add or update entries for directories
-        for (File item : directoriesToProcess.keySet()) {
-            DiskItem usage = computeDirectoryUsage(directoriesToProcess.get(item), item);
+        for (Map.Entry<File,String> item : directoriesToProcess.entrySet()) {
+            DiskItem usage = computeDirectoryUsage(item.getValue(), item.getKey());
             if (usage != null) {
                 if (directoriesUsages.contains(usage)) {
                     directoriesUsages.remove(usage);
