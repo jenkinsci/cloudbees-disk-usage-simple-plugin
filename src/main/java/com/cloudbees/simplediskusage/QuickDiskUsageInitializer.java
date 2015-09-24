@@ -29,7 +29,7 @@ import jenkins.model.Jenkins;
 
 public class QuickDiskUsageInitializer {
     /**
-     * Let's update data after Jenkins is started (to not slow down the loading)
+     * Let's update data after Jenkins is started and all jobs are loaded
      */
     @Initializer(after = InitMilestone.JOB_LOADED)
     public static void initialize() {

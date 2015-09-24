@@ -44,8 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -59,7 +57,6 @@ import java.util.logging.Logger;
 @Extension
 @Singleton
 public class QuickDiskUsagePlugin extends Plugin {
-
 
     public static final String DISK_USAGE =
             System.getProperty("os.name").toLowerCase().contains("mac")
@@ -85,6 +82,19 @@ public class QuickDiskUsagePlugin extends Plugin {
     private long lastRunStart = 0;
 
     private long lastRunEnd = 0;
+
+    @Override
+    public void start() throws Exception {
+        try {
+            load();
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Failed to load "+getConfigXml(),e);
+        }
+        if(isRunning()){
+            // It's impossible, the plugin was just loaded. Let's reset end date
+            lastRunEnd = lastRunStart;
+        }
+    }
 
     public void refreshData() {
         if (!isRunning()) {
@@ -253,7 +263,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
-    private final Runnable computeDiskUsage = new Runnable() {
+    private transient final Runnable computeDiskUsage = new Runnable() {
         public void run() {
             logger.info("Re-estimating disk usage");
             lastRunStart = System.currentTimeMillis();
@@ -273,6 +283,12 @@ public class QuickDiskUsagePlugin extends Plugin {
                 lastRunEnd = lastRunStart;
             } finally {
                 SecurityContextHolder.setContext(impersonate);
+            }
+            try{
+                // Save data
+                save();
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Failed to save "+getConfigXml(),e);
             }
         }
     };
