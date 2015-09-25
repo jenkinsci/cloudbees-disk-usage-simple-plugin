@@ -88,9 +88,9 @@ public class QuickDiskUsagePlugin extends Plugin {
         try {
             load();
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to load "+getConfigXml(),e);
+            logger.log(Level.WARNING, "Failed to load " + getConfigXml(), e);
         }
-        if(isRunning()){
+        if (isRunning()) {
             // It's impossible, the plugin was just loaded. Let's reset end date
             lastRunEnd = lastRunStart;
         }
@@ -251,7 +251,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
 
         // Add or update entries for directories
-        for (Map.Entry<File,String> item : directoriesToProcess.entrySet()) {
+        for (Map.Entry<File, String> item : directoriesToProcess.entrySet()) {
             DiskItem usage = computeDirectoryUsage(item.getValue(), item.getKey());
             if (usage != null) {
                 if (directoriesUsages.contains(usage)) {
@@ -284,11 +284,11 @@ public class QuickDiskUsagePlugin extends Plugin {
             } finally {
                 SecurityContextHolder.setContext(impersonate);
             }
-            try{
+            try {
                 // Save data
                 save();
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Failed to save "+getConfigXml(),e);
+                logger.log(Level.WARNING, "Failed to save " + getConfigXml(), e);
             }
         }
     };
