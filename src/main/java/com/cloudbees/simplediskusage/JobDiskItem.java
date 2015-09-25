@@ -32,7 +32,7 @@ public class JobDiskItem extends DiskItem {
     final String fullName;
     final String url;
 
-    public JobDiskItem(Job job, Long size) {
+    public JobDiskItem(Job<?, ?> job, Long size) {
         super(job.getFullDisplayName(), job.getRootDir(), size);
         this.fullName = job.getFullName();
         this.url = job.getUrl();
