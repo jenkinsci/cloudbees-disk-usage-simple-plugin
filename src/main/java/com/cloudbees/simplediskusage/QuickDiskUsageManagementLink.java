@@ -23,58 +23,45 @@
  */
 package com.cloudbees.simplediskusage;
 
-import java.io.File;
-import java.util.Objects;
+import hudson.Extension;
+import hudson.model.ManagementLink;
+import jenkins.model.Jenkins;
+import org.kohsuke.stapler.StaplerProxy;
 
-/**
- * A directory path on the disk with its usage information
- *
- * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
- */
-public class DiskItem implements Comparable<DiskItem> {
-
-    final String displayName;
-
-    final File path;
-
-    final Long usage;
-
-    public DiskItem(String displayName, File path, Long usage) {
-        this.displayName = displayName;
-        this.path = path;
-        this.usage = usage;
+@Extension
+public class QuickDiskUsageManagementLink extends ManagementLink implements StaplerProxy {
+    @Override
+    public String getIconFileName() {
+        return "/plugin/cloudbees-disk-usage-simple/images/disk.png";
     }
 
-    public File getPath() {
-        return path;
+    @Override
+    public String getDescription() {
+        return "Simple disk usage estimation";
     }
 
-    public Long getUsage() {
-        return usage;
-    }
-
+    @Override
     public String getDisplayName() {
-        return displayName;
+        return "Disk usage";
     }
 
     @Override
-    public int compareTo(DiskItem o) {
-        return Objects.compare(
-                getDisplayName() != null ? getDisplayName() : "",
-                o != null && o.getDisplayName() != null ? o.getDisplayName() : "",
-                String.CASE_INSENSITIVE_ORDER);
+    public String getUrlName() {
+        return "disk-usage-simple";
     }
 
+    /**
+     * Only sysadmin can access this page.
+     */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DiskItem diskItem = (DiskItem) o;
-        return Objects.equals(getPath(), diskItem.getPath());
+    public Object getTarget() {
+        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins == null) {
+            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
+        }
+        jenkins.checkPermission(Jenkins.ADMINISTER);
+        return jenkins.getPlugin(QuickDiskUsagePlugin.class);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getPath());
-    }
 }
