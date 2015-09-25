@@ -59,8 +59,7 @@
                     </j:forEach>
                 </tbody>
             </table>
-            <p></p>
-            <div style="padding:10px; border: solid 1px #000; background: #cfc">
+            <div style="padding:10px; margin-top: 10px; border: solid 1px #000; background: #cfc">
                 <h4>Tip</h4>
                 <p>
                     Most of the time, disk is consumed by job's build history, as each entry in history do archive
