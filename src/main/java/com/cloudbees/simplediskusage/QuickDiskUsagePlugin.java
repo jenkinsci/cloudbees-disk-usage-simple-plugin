@@ -24,32 +24,35 @@
 package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
+import hudson.Launcher;
 import hudson.Plugin;
+import hudson.Proc;
 import hudson.Util;
 import hudson.model.Job;
+import hudson.model.TaskListener;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
 import jenkins.util.Timer;
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
-import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -58,10 +61,10 @@ import java.util.logging.Logger;
 @Singleton
 public class QuickDiskUsagePlugin extends Plugin {
 
-    public static final String DISK_USAGE =
-            System.getProperty("os.name").toLowerCase().contains("mac")
-                    ? "du -ks" // OSX doesn't have ionice, this is only used during dev on my laptop
-                    : "ionice -c 3 du -ks";
+    public static final String DEFAULT_DU_COMMAND = "ionice -c 3 du -ks";
+
+    public static final String DU_COMMAND =
+            System.getProperty(QuickDiskUsagePlugin.class.getName() + ".command", DEFAULT_DU_COMMAND);
 
     public static final int QUIET_PERIOD = 15 * 60 * 1000;
 
@@ -163,20 +166,45 @@ public class QuickDiskUsagePlugin extends Plugin {
         res.forwardToPreviousPage(req);
     }
 
-    private long duDir(File path) throws IOException, InterruptedException {
+    private long computeDiskUsage(File path) throws IOException, InterruptedException {
         if (path == null || !path.exists() || !path.isDirectory()) return -1;
         logger.fine("Estimating usage for: " + path.getAbsolutePath());
-        Process p = Runtime.getRuntime().exec(DISK_USAGE, null, path);
-        try (BufferedReader stdOut = new BufferedReader(new InputStreamReader(p.getInputStream(), Charset.defaultCharset().name()))) {
-            String line = stdOut.readLine();
-            if (line != null && line.matches("[0-9]*\t.")) return Long.parseLong(line.substring(0, line.length() - 2));
-            logger.warning("failed to parse `du` output : " + line);
-            return -1;
+
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins == null) {
+            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
         }
+
+        // this write operation will lock the current thread if filesystem is frozen
+        // otherwise reads could block freeze operation and slow down snapshotting
+        jenkins.getRootPath().touch(System.currentTimeMillis());
+
+        Launcher.LocalLauncher launcher = new Launcher.LocalLauncher(TaskListener.NULL);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Proc proc = launcher.launch().cmds(StringUtils.split(DU_COMMAND)).pwd(path).stdout(out).start();
+
+        // give up after 20 seconds and kill 'du' process to prevent reads to put disk down to its knees
+        // before the next attempt, we might be blocked by the write operation above
+        int status = proc.joinWithTimeout(20, TimeUnit.SECONDS, TaskListener.NULL);
+
+        switch (status) {
+            case 0:
+                try {
+                    return Long.parseLong(StringUtils.removeEnd(out.toString("UTF-8"), "\t.\n"));
+                } catch (NumberFormatException e) {
+                    return -1;
+                }
+            case 143:
+                logger.warning("'du' process killed after 20 seconds of activity. You might be experiencing storage slowness");
+                return -1;
+        }
+
+        return -1;
     }
 
     private JobDiskItem computeJobUsage(Job job) throws IOException, InterruptedException {
-        long size = duDir(job.getRootDir());
+        long size = computeDiskUsage(job.getRootDir());
         if (size > 0) {
             return new JobDiskItem(job, size);
         } else {
@@ -208,12 +236,11 @@ public class QuickDiskUsagePlugin extends Plugin {
                 }
 
             }
-            Thread.sleep(1000); //To keep load average nice and low
         }
     }
 
     private DiskItem computeDirectoryUsage(String displayName, File path) throws IOException, InterruptedException {
-        long size = duDir(path);
+        long size = computeDiskUsage(path);
         if (size > 0) {
             return new DiskItem(displayName, path, size);
         } else {
