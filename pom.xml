@@ -54,6 +54,28 @@
     </license>
   </licenses>
 
+  <developers>
+    <developer>
+      <id>ndeloof</id>
+      <name>Nicolas De Loof</name>
+      <email>nicolas.deloof@gmail.com</email>
+    </developer>
+    <developer>
+      <id>aheritier</id>
+      <name>Arnaud Heritier</name>
+      <email>aheritier@apache.org</email>
+    </developer>
+    <developer>
+      <id>recena</id>
+      <name>Manuel Recena</name>
+      <email>recena@gmail.com</email>
+    </developer>
+    <developer>
+      <id>ydubreuil</id>
+      <name>Yoann Dubreuil</name>
+    </developer>
+  </developers>
+
   <scm>
     <connection>scm:git:git@github.com:jenkinsci/cloudbees-disk-usage-simple-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/cloudbees-disk-usage-simple-plugin.git</developerConnection>
