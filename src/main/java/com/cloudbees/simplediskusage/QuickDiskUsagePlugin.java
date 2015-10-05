@@ -205,12 +205,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     private JobDiskItem computeJobUsage(Job job) throws IOException, InterruptedException {
-        long size = computeDiskUsage(job.getRootDir());
-        if (size > 0) {
-            return new JobDiskItem(job, size);
-        } else {
-            return null;
-        }
+        return new JobDiskItem(job, computeDiskUsage(job.getRootDir()));
     }
 
     private void computeJobsUsages() throws IOException, InterruptedException {
@@ -241,12 +236,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     private DiskItem computeDirectoryUsage(String displayName, File path) throws IOException, InterruptedException {
-        long size = computeDiskUsage(path);
-        if (size > 0) {
-            return new DiskItem(displayName, path, size);
-        } else {
-            return null;
-        }
+        return new DiskItem(displayName, path, computeDiskUsage(path));
     }
 
 
