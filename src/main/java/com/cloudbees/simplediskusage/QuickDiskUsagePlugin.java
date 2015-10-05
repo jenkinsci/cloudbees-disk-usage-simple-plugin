@@ -169,7 +169,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     private long computeDiskUsage(File path) throws IOException, InterruptedException {
         if (path == null || !path.exists() || !path.isDirectory()) return -1;
         logger.fine("Estimating usage for: " + path.getAbsolutePath());
-
+        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins == null) {
             throw new IllegalStateException("Jenkins has not been started, or was already shut down");
