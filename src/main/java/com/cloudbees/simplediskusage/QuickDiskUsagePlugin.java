@@ -196,7 +196,8 @@ public class QuickDiskUsagePlugin extends Plugin {
                     return -1;
                 }
             case 143:
-                logger.warning("'du' process killed after 20 seconds of activity. You might be experiencing storage slowness");
+                logger.warning("Time to compute the size of '" + path.getCanonicalPath()
+                        + "' is too long. 'du' process killed after 20 seconds of activity. You might be experiencing storage slowness.");
                 return -1;
         }
 
