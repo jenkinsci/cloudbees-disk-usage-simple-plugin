@@ -44,16 +44,17 @@
                 </thead>
                 <tbody>
                     <j:forEach var="e" items="${it.directoriesUsages}">
-                        <tr>
-                            <td class="pane">${e.displayName}</td>
-                            <td class="pane" style="text-align: right">
-                                <j:choose>
-                                    <j:when test="${e.usage >= 0}">${e.usage}</j:when>
-                                    <j:when test="${e.usage == 0}"></j:when>
-                                    <j:otherwise>N/A</j:otherwise>
-                                </j:choose>
-                            </td>
-                        </tr>
+                        <j:if test="${e.usage != 0}">
+                            <tr>
+                                <td class="pane">${e.displayName}</td>
+                                <td class="pane" style="text-align: right">
+                                    <j:choose>
+                                        <j:when test="${e.usage > 0}">${e.usage}</j:when>
+                                        <j:otherwise>N/A</j:otherwise>
+                                    </j:choose>
+                                </td>
+                            </tr>
+                        </j:if>
                     </j:forEach>
                 </tbody>
             </table>
