@@ -135,4 +135,31 @@
     </pluginManagement>
   </build>
 
+  <profiles>
+    <profile>
+      <id>dev-on-macos</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.jenkins-ci.tools</groupId>
+              <artifactId>maven-hpi-plugin</artifactId>
+              <configuration>
+                <systemProperties>
+                  <!-- There is no ionice command on MacOS X -->
+                  <com.cloudbees.simplediskusage.QuickDiskUsagePlugin.command>du -ks</com.cloudbees.simplediskusage.QuickDiskUsagePlugin.command>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
