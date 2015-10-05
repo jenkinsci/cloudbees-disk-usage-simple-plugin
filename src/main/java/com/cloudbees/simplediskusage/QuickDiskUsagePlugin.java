@@ -23,11 +23,7 @@
  */
 package com.cloudbees.simplediskusage;
 
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.Plugin;
-import hudson.Proc;
-import hudson.Util;
+import hudson.*;
 import hudson.model.Job;
 import hudson.model.TaskListener;
 import hudson.model.TopLevelItem;
@@ -177,7 +173,12 @@ public class QuickDiskUsagePlugin extends Plugin {
 
         // this write operation will lock the current thread if filesystem is frozen
         // otherwise reads could block freeze operation and slow down snapshotting
-        jenkins.getRootPath().touch(System.currentTimeMillis());
+        FilePath jenkinsHome = jenkins.getRootPath();
+        if (jenkinsHome != null) {
+            jenkinsHome.touch(System.currentTimeMillis());
+        } else {
+            return -1;
+        }
 
         Launcher.LocalLauncher launcher = new Launcher.LocalLauncher(TaskListener.NULL);
 
