@@ -25,30 +25,29 @@ package com.cloudbees.simplediskusage;
 
 import hudson.*;
 import hudson.model.Job;
-import hudson.model.TaskListener;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
+import hudson.util.NamingThreadFactory;
 import jenkins.model.Jenkins;
 import jenkins.util.Timer;
 import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.context.SecurityContextHolder;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import javax.inject.Singleton;
 import javax.servlet.ServletException;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,20 +56,10 @@ import java.util.logging.Logger;
 @Singleton
 public class QuickDiskUsagePlugin extends Plugin {
 
-    public static final String DEFAULT_DU_COMMAND = "ionice -c 3 du -ks";
-
-    public static final String DU_COMMAND =
-            System.getProperty(QuickDiskUsagePlugin.class.getName() + ".command", DEFAULT_DU_COMMAND);
-
     public static final int QUIET_PERIOD = 15 * 60 * 1000;
 
-    private static Executor ex = Executors.newSingleThreadExecutor(new ThreadFactory() {
-        public Thread newThread(Runnable r) {
-            Thread t = new Thread(r);
-            t.setName("Simple disk usage checker");
-            return t;
-        }
-    });
+    private static Executor singleExecutorService = Executors.newSingleThreadExecutor(
+            new NamingThreadFactory(Executors.defaultThreadFactory(),"Simple disk usage computation"));
 
     private static final Logger logger = Logger.getLogger(QuickDiskUsagePlugin.class.getName());
 
@@ -97,7 +86,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     public void refreshData() {
         if (!isRunning()) {
-            ex.execute(computeDiskUsage);
+            singleExecutorService.execute(computeDiskUsage);
         }
     }
 
@@ -162,87 +151,62 @@ public class QuickDiskUsagePlugin extends Plugin {
         res.forwardToPreviousPage(req);
     }
 
-    private long computeDiskUsage(File path) throws IOException, InterruptedException {
-        if (path == null || !path.exists() || !path.isDirectory()) return -1;
-        logger.fine("Estimating usage for: " + path.getAbsolutePath());
-        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
+    class JobUsageListener implements UsageComputation.CompletionListener {
+        final Job<?, ?> job;
+
+        JobUsageListener(Job<?, ?> job) {
+            this.job = job;
+        }
+
+        @Override
+        public void onCompleted(Path dir, long usage) {
+            JobDiskItem jobDiskItem = new JobDiskItem(job, usage / 1024);
+            if (jobsUsages.contains(jobDiskItem)) {
+                jobsUsages.remove(jobDiskItem);
+            }
+            jobsUsages.add(jobDiskItem);
+        }
+    }
+
+    class DirectoryUsageListener implements UsageComputation.CompletionListener {
+        final String displayName;
+
+        DirectoryUsageListener(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public void onCompleted(Path dir, long usage) {
+            DiskItem diskItem = new DiskItem(displayName, dir.toFile(), usage / 1024);
+            if (directoriesUsages.contains(diskItem)) {
+                directoriesUsages.remove(diskItem);
+            }
+            directoriesUsages.add(diskItem);
+        }
+    }
+
+    private void registerJobs(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins == null) {
             throw new IllegalStateException("Jenkins has not been started, or was already shut down");
         }
 
-        // this write operation will lock the current thread if filesystem is frozen
-        // otherwise reads could block freeze operation and slow down snapshotting
-        FilePath jenkinsHome = jenkins.getRootPath();
-        if (jenkinsHome != null) {
-            jenkinsHome.touch(System.currentTimeMillis());
-        } else {
-            return -1;
-        }
-
-        Launcher.LocalLauncher launcher = new Launcher.LocalLauncher(TaskListener.NULL);
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        Proc proc = launcher.launch().cmds(StringUtils.split(DU_COMMAND)).pwd(path).stdout(out).start();
-
-        // give up after 20 seconds and kill 'du' process to prevent reads to put disk down to its knees
-        // before the next attempt, we might be blocked by the write operation above
-        int status = proc.joinWithTimeout(20, TimeUnit.SECONDS, TaskListener.NULL);
-
-        switch (status) {
-            case 0:
-                try {
-                    return Long.parseLong(StringUtils.removeEnd(out.toString("UTF-8"), "\t.\n"));
-                } catch (NumberFormatException e) {
-                    return -1;
-                }
-            case 143:
-                logger.warning("Time to compute the size of '" + path.getCanonicalPath()
-                        + "' is too long. 'du' process killed after 20 seconds of activity. You might be experiencing storage slowness.");
-                return -1;
-        }
-
-        return -1;
-    }
-
-    private JobDiskItem computeJobUsage(Job job) throws IOException, InterruptedException {
-        return new JobDiskItem(job, computeDiskUsage(job.getRootDir()));
-    }
-
-    private void computeJobsUsages() throws IOException, InterruptedException {
-        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
-        Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
         // Remove useless entries for jobs
         for (JobDiskItem item : jobsUsages) {
             if (!item.getPath().exists() || jenkins.getItemByFullName(item.getFullName(), Job.class) == null) {
                 jobsUsages.remove(item);
             }
         }
-        // Add or update entries for jobs
-        for (Job item : jenkins.getAllItems(Job.class)) {
-            if (item instanceof TopLevelItem) {
-                JobDiskItem usage = computeJobUsage(item);
-                if (usage != null) {
-                    if (jobsUsages.contains(usage)) {
-                        jobsUsages.remove(usage);
-                    }
-                    jobsUsages.add(usage);
-                }
 
+        // Add or update entries for jobs
+        for (Job job : jenkins.getAllItems(Job.class)) {
+            if (job instanceof TopLevelItem) {
+                uc.addListener(job.getRootDir().toPath(), new JobUsageListener(job));
             }
         }
     }
 
-    private DiskItem computeDirectoryUsage(String displayName, File path) throws IOException, InterruptedException {
-        return new DiskItem(displayName, path, computeDiskUsage(path));
-    }
-
-
-    private void computeDirectoriesUsages() throws IOException, InterruptedException {
-        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
+    private void registerDirectories(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins == null) {
             throw new IllegalStateException("Jenkins has not been started, or was already shut down");
@@ -271,14 +235,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
         // Add or update entries for directories
         for (Map.Entry<File, String> item : directoriesToProcess.entrySet()) {
-            DiskItem usage = computeDirectoryUsage(item.getValue(), item.getKey());
-            if (usage != null) {
-                if (directoriesUsages.contains(usage)) {
-                    directoriesUsages.remove(usage);
-                }
-                directoriesUsages.add(usage);
-            }
-            Thread.sleep(1000); //To keep load average nice and low
+            uc.addListener(item.getKey().toPath(), new DirectoryUsageListener(item.getValue()));
         }
     }
 
@@ -293,8 +250,10 @@ public class QuickDiskUsagePlugin extends Plugin {
                 throw new IllegalStateException("Jenkins has not been started, or was already shut down");
             }
             try {
-                computeJobsUsages();
-                computeDirectoriesUsages();
+                UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
+                registerJobs(uc);
+                registerDirectories(uc);
+                uc.compute();
                 logger.info("Finished re-estimating disk usage.");
                 lastRunEnd = System.currentTimeMillis();
             } catch (IOException | InterruptedException e) {
