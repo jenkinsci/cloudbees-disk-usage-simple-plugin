@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.580.3</version>
+    <version>2.22</version>
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
@@ -156,32 +156,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>dev-on-macos</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.jenkins-ci.tools</groupId>
-              <artifactId>maven-hpi-plugin</artifactId>
-              <configuration>
-                <systemProperties>
-                  <!-- There is no ionice command on MacOS X -->
-                  <com.cloudbees.simplediskusage.QuickDiskUsagePlugin.command>du -ks</com.cloudbees.simplediskusage.QuickDiskUsagePlugin.command>
-                </systemProperties>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
-    </profile>
-  </profiles>
-
 </project>
