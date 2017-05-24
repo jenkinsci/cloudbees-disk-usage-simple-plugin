@@ -34,7 +34,7 @@
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
-  <version>0.7-SNAPSHOT</version>
+  <version>0.7</version>
   <packaging>hpi</packaging>
 
   <name>CloudBees Disk Usage Simple Plugin</name>
@@ -80,7 +80,7 @@
     <connection>scm:git:git@github.com:jenkinsci/cloudbees-disk-usage-simple-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/cloudbees-disk-usage-simple-plugin.git</developerConnection>
     <url>http://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin</url>
-    <tag>HEAD</tag>
+    <tag>cloudbees-disk-usage-simple-0.7</tag>
   </scm>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
