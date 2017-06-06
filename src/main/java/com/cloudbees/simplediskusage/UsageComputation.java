@@ -1,5 +1,8 @@
 package com.cloudbees.simplediskusage;
 
+import hudson.FilePath;
+import jenkins.model.Jenkins;
+
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -49,13 +52,35 @@ public class UsageComputation {
     protected void computeUsage(Path path) throws IOException {
         // we don't really need AtomicLong here, walking the tree is synchronous, but
         // it's convenient for the operations it provides
+
+        // used to throttle IO
         final AtomicLong chunkStartTime = new AtomicLong(System.currentTimeMillis());
+
+        // used to lock this thread if there's a FS freeze ongoing
+        final AtomicLong writableLastCheckTime = new AtomicLong(System.currentTimeMillis());
+
         final Stack<AtomicLong> computeStack = new Stack<>();
         computeStack.push(new AtomicLong(0));
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 computeStack.push(new AtomicLong(0));
+
+                // check every 10 seconds that the process can write on JENKINS_HOME
+                // this will lock this thread if the filesystem is frozen
+                // this is to speed up the FS freeze operation which is otherwise slowed down
+                if (System.currentTimeMillis() - writableLastCheckTime.get() > 10000) {
+                    writableLastCheckTime.set(System.currentTimeMillis());
+                    FilePath jenkinsHome = Jenkins.getActiveInstance().getRootPath();
+                    if (jenkinsHome != null) {
+                        try {
+                            jenkinsHome.touch(System.currentTimeMillis());
+                        } catch (InterruptedException e) {
+                            logger.log(Level.INFO, "Exception while touching JENKINS_HOME", e);
+                        }
+                    }
+                }
+
                 return FileVisitResult.CONTINUE;
             }
 
