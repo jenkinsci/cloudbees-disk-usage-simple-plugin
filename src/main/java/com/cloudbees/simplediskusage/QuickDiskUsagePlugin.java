@@ -24,6 +24,7 @@
 package com.cloudbees.simplediskusage;
 
 import hudson.*;
+import hudson.init.InitMilestone;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
@@ -50,7 +51,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 
 @Extension
 @Singleton
@@ -88,6 +88,10 @@ public class QuickDiskUsagePlugin extends Plugin {
         if (!isRunning()) {
             singleExecutorService.execute(computeDiskUsage);
         }
+    }
+
+    public void refreshDataOnStartup() {
+         singleExecutorService.execute(computeDiskUsageOnStartup);
     }
 
     public CopyOnWriteArrayList<DiskItem> getDirectoriesUsages() throws IOException {
@@ -271,4 +275,22 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     };
 
+    private transient final Runnable computeDiskUsageOnStartup = new Runnable() {
+        public void run() {
+            // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
+            Jenkins jenkins = Jenkins.getInstance();
+            if (jenkins == null) {
+                throw new IllegalStateException("Jenkins has not been started, or was already shut down");
+            }
+            while (jenkins.getInitLevel() != InitMilestone.COMPLETED) {
+                try {
+                    logger.log(Level.INFO, "Waiting for Jenkins to be up before computing disk usage");
+                    Thread.sleep(3 * 60 * 1000);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
+            refreshData();
+        }
+    };
 }

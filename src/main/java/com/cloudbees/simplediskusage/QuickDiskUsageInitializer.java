@@ -29,7 +29,11 @@ import jenkins.model.Jenkins;
 
 public class QuickDiskUsageInitializer {
     /**
-     * Let's update data after Jenkins is started and all jobs are loaded
+     * Let's trigger an update after Jenkins is fully up.
+     *
+     * JOB_LOADED is the last milestone that can be triggered with an @Initializer,
+     * COMPLETED doesn't work. So, we queue the update and check that Jenkins is fully up in the runnable
+     * used in refreshDataOnStartup()
      */
     @Initializer(after = InitMilestone.JOB_LOADED)
     public static void initialize() {
@@ -40,7 +44,7 @@ public class QuickDiskUsageInitializer {
         }
         QuickDiskUsagePlugin plugin = jenkins.getPlugin(QuickDiskUsagePlugin.class);
         if (plugin == null) return;
-        plugin.refreshData();
+        plugin.refreshDataOnStartup();
     }
 
 }
