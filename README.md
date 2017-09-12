@@ -10,4 +10,4 @@ To use this plugin visit the `Manage Jenkins` -> `Disk usage` page.
 
 # Resources
 * Continuous Integration: [![Build Status](https://jenkins.ci.cloudbees.com/buildStatus/icon?job=plugins/cloudbees-disk-usage-simple-plugin)](https://jenkins.ci.cloudbees.com/job/plugins/job/cloudbees-disk-usage-simple-plugin)
-* Issues Tracking: [Jira](https://issues.jenkins-ci.org/browse/JENKINS/component/20652)
+* Issues Tracking: [Jira](https://issues.jenkins-ci.org/browse/JENKINS-45943?jql=project%20%3D%20JENKINS%20AND%20component%20%3D%20cloudbees-disk-usage-simple-plugin)
