@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,6 +71,12 @@ public class QuickDiskUsagePlugin extends Plugin {
     private long lastRunStart = 0;
 
     private long lastRunEnd = 0;
+
+    protected AtomicInteger progress = new AtomicInteger();
+    
+    protected AtomicInteger total = new AtomicInteger();
+
+
 
     @Override
     public void start() throws Exception {
@@ -169,6 +176,7 @@ public class QuickDiskUsagePlugin extends Plugin {
                 jobsUsages.remove(jobDiskItem);
             }
             jobsUsages.add(jobDiskItem);
+            progress.incrementAndGet();
         }
     }
 
@@ -186,6 +194,7 @@ public class QuickDiskUsagePlugin extends Plugin {
                 directoriesUsages.remove(diskItem);
             }
             directoriesUsages.add(diskItem);
+            progress.incrementAndGet();
         }
     }
 
@@ -243,9 +252,20 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
+
+    public int getItemsCount() {
+        return total.intValue();
+    }
+
+    public int getProgress() {
+        return progress.intValue();
+    }
+
     private transient final Runnable computeDiskUsage = new Runnable() {
+
         public void run() {
             logger.info("Re-estimating disk usage");
+            progress.set(0);
             lastRunStart = System.currentTimeMillis();
             SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
             // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
@@ -257,6 +277,7 @@ public class QuickDiskUsagePlugin extends Plugin {
                 UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
                 registerJobs(uc);
                 registerDirectories(uc);
+                total.set(uc.getItemsCount());
                 uc.compute();
                 logger.info("Finished re-estimating disk usage.");
                 lastRunEnd = System.currentTimeMillis();

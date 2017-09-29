@@ -34,6 +34,9 @@
             <j:when test="${it.running}">
                 <strong>Update in progress</strong>, please
                 <a href=".">try again in a short while</a>
+                <br/>
+                <progress value="${it.progress}" max="${it.itemsCount}"/>
+                <br/>
             </j:when>
             <j:otherwise>
                 Computed ${it.since} ago. Took ${it.duration}.

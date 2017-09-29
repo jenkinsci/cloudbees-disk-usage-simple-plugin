@@ -43,6 +43,10 @@ public class UsageComputation {
         listenerMap.put(path.toAbsolutePath(), listener);
     }
 
+    public int getItemsCount() {
+        return listenerMap.size();
+    }
+
     public void compute() throws IOException {
         for (Path path : pathsToScan) {
             computeUsage(path.toAbsolutePath());
