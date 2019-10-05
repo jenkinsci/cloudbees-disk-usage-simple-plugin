@@ -37,14 +37,9 @@ public class QuickDiskUsageInitializer {
      */
     @Initializer(after = InitMilestone.JOB_LOADED)
     public static void initialize() {
-        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
         QuickDiskUsagePlugin plugin = jenkins.getPlugin(QuickDiskUsagePlugin.class);
         if (plugin == null) return;
         plugin.refreshDataOnStartup();
     }
-
 }

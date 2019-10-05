@@ -75,7 +75,7 @@ public class UsageComputation {
                 // this is to speed up the FS freeze operation which is otherwise slowed down
                 if (System.currentTimeMillis() - writableLastCheckTime.get() > 10000) {
                     writableLastCheckTime.set(System.currentTimeMillis());
-                    FilePath jenkinsHome = Jenkins.getActiveInstance().getRootPath();
+                    FilePath jenkinsHome = Jenkins.getInstance().getRootPath();
                     if (jenkinsHome != null) {
                         try {
                             jenkinsHome.touch(System.currentTimeMillis());
