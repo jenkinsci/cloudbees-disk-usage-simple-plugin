@@ -76,12 +76,10 @@ public class UsageComputation {
                 if (System.currentTimeMillis() - writableLastCheckTime.get() > 10000) {
                     writableLastCheckTime.set(System.currentTimeMillis());
                     FilePath jenkinsHome = Jenkins.getInstance().getRootPath();
-                    if (jenkinsHome != null) {
-                        try {
-                            jenkinsHome.touch(System.currentTimeMillis());
-                        } catch (InterruptedException e) {
-                            logger.log(Level.INFO, "Exception while touching JENKINS_HOME", e);
-                        }
+                    try {
+                        jenkinsHome.touch(System.currentTimeMillis());
+                    } catch (InterruptedException e) {
+                        logger.log(Level.INFO, "Exception while touching JENKINS_HOME", e);
                     }
                 }
 
