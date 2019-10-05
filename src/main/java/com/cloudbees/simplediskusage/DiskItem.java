@@ -33,11 +33,9 @@ import java.util.Objects;
  */
 public class DiskItem implements Comparable<DiskItem> {
 
-    final String displayName;
-
-    final File path;
-
-    final Long usage;
+    private final String displayName;
+    private final File path;
+    private final Long usage;
 
     public DiskItem(String displayName, File path, Long usage) {
         this.displayName = displayName;

@@ -29,8 +29,9 @@ import hudson.model.Job;
  * A job directory path on the disk with its usage information
  */
 public class JobDiskItem extends DiskItem {
-    final String fullName;
-    final String url;
+
+    private final String fullName;
+    private final String url;
 
     public JobDiskItem(Job<?, ?> job, Long size) {
         super(job.getFullDisplayName(), job.getRootDir(), size);
@@ -45,5 +46,4 @@ public class JobDiskItem extends DiskItem {
     public String getUrl() {
         return url;
     }
-
 }

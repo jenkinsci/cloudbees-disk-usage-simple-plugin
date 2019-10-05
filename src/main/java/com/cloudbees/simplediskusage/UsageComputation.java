@@ -30,9 +30,8 @@ public class UsageComputation {
         void onCompleted(Path dir, long usage);
     }
 
-    final Map<Path, CompletionListener> listenerMap;
-
-    final List<Path> pathsToScan;
+    private final Map<Path, CompletionListener> listenerMap;
+    private final List<Path> pathsToScan;
 
     public UsageComputation(List<Path> pathsToScan) {
         this.pathsToScan = pathsToScan;
