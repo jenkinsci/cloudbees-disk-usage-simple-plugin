@@ -28,11 +28,10 @@ import hudson.init.InitMilestone;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
+import hudson.security.ACLContext;
 import hudson.util.NamingThreadFactory;
 import jenkins.model.Jenkins;
 import jenkins.util.Timer;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -253,9 +252,8 @@ public class QuickDiskUsagePlugin extends Plugin {
             logger.info("Re-estimating disk usage");
             progress.set(0);
             lastRunStart = System.currentTimeMillis();
-            SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
             Jenkins jenkins = Jenkins.getInstance();
-            try {
+            try (ACLContext old = ACL.as(ACL.SYSTEM)) {
                 UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
                 registerJobs(uc);
                 registerDirectories(uc);
@@ -266,8 +264,6 @@ public class QuickDiskUsagePlugin extends Plugin {
             } catch (IOException | InterruptedException e) {
                 logger.log(Level.INFO, "Unable to run disk usage check", e);
                 lastRunEnd = lastRunStart;
-            } finally {
-                SecurityContextHolder.setContext(impersonate);
             }
             try {
                 // Save data
