@@ -39,7 +39,7 @@
 
   <name>CloudBees Disk Usage Simple Plugin</name>
   <description>This will use du to estimate job disk usage in an efficient way that doesn't slow down the host system</description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/CloudBees+Simple+Disk+Usage+Plugin</url>
+  <url>https://wiki.jenkins.io/display/JENKINS/CloudBees+Simple+Disk+Usage+Plugin</url>
 
   <properties>
     <findbugs-maven-plugin.version>3.0.1</findbugs-maven-plugin.version>
