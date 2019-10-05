@@ -58,24 +58,22 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     public static final int QUIET_PERIOD = 15 * 60 * 1000;
 
-    private static Executor singleExecutorService = Executors.newSingleThreadExecutor(
+    private static final Executor singleExecutorService = Executors.newSingleThreadExecutor(
             new NamingThreadFactory(Executors.defaultThreadFactory(),"Simple disk usage computation"));
 
     private static final Logger logger = Logger.getLogger(QuickDiskUsagePlugin.class.getName());
 
-    private CopyOnWriteArrayList<DiskItem> directoriesUsages = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<DiskItem> directoriesUsages = new CopyOnWriteArrayList<>();
 
-    private CopyOnWriteArrayList<JobDiskItem> jobsUsages = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<JobDiskItem> jobsUsages = new CopyOnWriteArrayList<>();
 
     private long lastRunStart = 0;
 
     private long lastRunEnd = 0;
 
-    protected AtomicInteger progress = new AtomicInteger();
+    protected final AtomicInteger progress = new AtomicInteger();
     
-    protected AtomicInteger total = new AtomicInteger();
-
-
+    protected final AtomicInteger total = new AtomicInteger();
 
     @Override
     public void start() throws Exception {
@@ -236,7 +234,6 @@ public class QuickDiskUsagePlugin extends Plugin {
             uc.addListener(item.getKey().toPath(), new DirectoryUsageListener(item.getValue()));
         }
     }
-
 
     public int getItemsCount() {
         return total.intValue();

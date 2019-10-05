@@ -30,7 +30,7 @@ public class UsageComputation {
         void onCompleted(Path dir, long usage);
     }
 
-    Map<Path, CompletionListener> listenerMap;
+    final Map<Path, CompletionListener> listenerMap;
 
     final List<Path> pathsToScan;
 
