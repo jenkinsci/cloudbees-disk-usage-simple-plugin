@@ -9,5 +9,5 @@ This is a simple disk usage plugin that calculates disk usage while limiting the
 To use this plugin visit the `Manage Jenkins` -> `Disk usage` page.
 
 # Resources
-* Continuous Integration: [![Build Status](https://jenkins.ci.cloudbees.com/buildStatus/icon?job=plugins/cloudbees-disk-usage-simple-plugin)](https://jenkins.ci.cloudbees.com/job/plugins/job/cloudbees-disk-usage-simple-plugin)
-* Issues Tracking: [Jira](https://issues.jenkins-ci.org/browse/JENKINS/component/20652)
+* Continuous Integration: [![Build Status](https://ci.jenkins.io/job/Plugins/job/cloudbees-disk-usage-simple-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/cloudbees-disk-usage-simple-plugin/job/master/)
+* Issues Tracking: [Jira](https://issues.jenkins-ci.org/issues/?jql=project+%3D+JENKINS+AND+component+%3D+cloudbees-disk-usage-simple-plugin)

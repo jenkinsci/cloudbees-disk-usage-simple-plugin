@@ -30,9 +30,8 @@ public class UsageComputation {
         void onCompleted(Path dir, long usage);
     }
 
-    Map<Path, CompletionListener> listenerMap;
-
-    final List<Path> pathsToScan;
+    private final Map<Path, CompletionListener> listenerMap;
+    private final List<Path> pathsToScan;
 
     public UsageComputation(List<Path> pathsToScan) {
         this.pathsToScan = pathsToScan;
@@ -75,13 +74,11 @@ public class UsageComputation {
                 // this is to speed up the FS freeze operation which is otherwise slowed down
                 if (System.currentTimeMillis() - writableLastCheckTime.get() > 10000) {
                     writableLastCheckTime.set(System.currentTimeMillis());
-                    FilePath jenkinsHome = Jenkins.getActiveInstance().getRootPath();
-                    if (jenkinsHome != null) {
-                        try {
-                            jenkinsHome.touch(System.currentTimeMillis());
-                        } catch (InterruptedException e) {
-                            logger.log(Level.INFO, "Exception while touching JENKINS_HOME", e);
-                        }
+                    FilePath jenkinsHome = Jenkins.getInstance().getRootPath();
+                    try {
+                        jenkinsHome.touch(System.currentTimeMillis());
+                    } catch (InterruptedException e) {
+                        logger.log(Level.INFO, "Exception while touching JENKINS_HOME", e);
                     }
                 }
 

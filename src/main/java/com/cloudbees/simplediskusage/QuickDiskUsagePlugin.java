@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2015, CloudBees, Inc.
@@ -28,11 +28,10 @@ import hudson.init.InitMilestone;
 import hudson.model.Job;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
+import hudson.security.ACLContext;
 import hudson.util.NamingThreadFactory;
 import jenkins.model.Jenkins;
 import jenkins.util.Timer;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
@@ -59,24 +58,22 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     public static final int QUIET_PERIOD = 15 * 60 * 1000;
 
-    private static Executor singleExecutorService = Executors.newSingleThreadExecutor(
+    private static final Executor singleExecutorService = Executors.newSingleThreadExecutor(
             new NamingThreadFactory(Executors.defaultThreadFactory(),"Simple disk usage computation"));
 
     private static final Logger logger = Logger.getLogger(QuickDiskUsagePlugin.class.getName());
 
-    private CopyOnWriteArrayList<DiskItem> directoriesUsages = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<DiskItem> directoriesUsages = new CopyOnWriteArrayList<>();
 
-    private CopyOnWriteArrayList<JobDiskItem> jobsUsages = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<JobDiskItem> jobsUsages = new CopyOnWriteArrayList<>();
 
     private long lastRunStart = 0;
 
     private long lastRunEnd = 0;
 
-    protected AtomicInteger progress = new AtomicInteger();
+    private final AtomicInteger progress = new AtomicInteger();
     
-    protected AtomicInteger total = new AtomicInteger();
-
-
+    private final AtomicInteger total = new AtomicInteger();
 
     @Override
     public void start() throws Exception {
@@ -143,11 +140,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     @RequirePOST
     public void doClean(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
-        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
         final Job job = jenkins.getItemByFullName(req.getParameter("job"), Job.class);
         Timer.get().submit(new Runnable() {
             @Override
@@ -172,9 +165,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         @Override
         public void onCompleted(Path dir, long usage) {
             JobDiskItem jobDiskItem = new JobDiskItem(job, usage / 1024);
-            if (jobsUsages.contains(jobDiskItem)) {
-                jobsUsages.remove(jobDiskItem);
-            }
+            jobsUsages.remove(jobDiskItem);
             jobsUsages.add(jobDiskItem);
             progress.incrementAndGet();
         }
@@ -190,9 +181,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         @Override
         public void onCompleted(Path dir, long usage) {
             DiskItem diskItem = new DiskItem(displayName, dir.toFile(), usage / 1024);
-            if (directoriesUsages.contains(diskItem)) {
-                directoriesUsages.remove(diskItem);
-            }
+            directoriesUsages.remove(diskItem);
             directoriesUsages.add(diskItem);
             progress.incrementAndGet();
         }
@@ -200,9 +189,6 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     private void registerJobs(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
 
         // Remove useless entries for jobs
         for (JobDiskItem item : jobsUsages) {
@@ -221,9 +207,6 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     private void registerDirectories(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
         Map<File, String> directoriesToProcess = new HashMap<>();
         // Display JENKINS_HOME size
         directoriesToProcess.put(jenkins.getRootDir(), "JENKINS_HOME");
@@ -252,7 +235,6 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
-
     public int getItemsCount() {
         return total.intValue();
     }
@@ -267,13 +249,8 @@ public class QuickDiskUsagePlugin extends Plugin {
             logger.info("Re-estimating disk usage");
             progress.set(0);
             lastRunStart = System.currentTimeMillis();
-            SecurityContext impersonate = ACL.impersonate(ACL.SYSTEM);
-            // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
             Jenkins jenkins = Jenkins.getInstance();
-            if (jenkins == null) {
-                throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-            }
-            try {
+            try (ACLContext old = ACL.as(ACL.SYSTEM)) {
                 UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
                 registerJobs(uc);
                 registerDirectories(uc);
@@ -284,8 +261,6 @@ public class QuickDiskUsagePlugin extends Plugin {
             } catch (IOException | InterruptedException e) {
                 logger.log(Level.INFO, "Unable to run disk usage check", e);
                 lastRunEnd = lastRunStart;
-            } finally {
-                SecurityContextHolder.setContext(impersonate);
             }
             try {
                 // Save data
@@ -298,11 +273,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     private transient final Runnable computeDiskUsageOnStartup = new Runnable() {
         public void run() {
-            // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
             Jenkins jenkins = Jenkins.getInstance();
-            if (jenkins == null) {
-                throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-            }
             while (jenkins.getInitLevel() != InitMilestone.COMPLETED) {
                 try {
                     logger.log(Level.INFO, "Waiting for Jenkins to be up before computing disk usage");

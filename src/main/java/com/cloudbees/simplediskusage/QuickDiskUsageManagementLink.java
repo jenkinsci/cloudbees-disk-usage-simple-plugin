@@ -1,4 +1,4 @@
-/**
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2015, CloudBees, Inc.
@@ -55,13 +55,8 @@ public class QuickDiskUsageManagementLink extends ManagementLink implements Stap
      */
     @Override
     public Object getTarget() {
-        // TODO switch to Jenkins.getActiveInstance() once 1.590+ is the baseline
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            throw new IllegalStateException("Jenkins has not been started, or was already shut down");
-        }
         jenkins.checkPermission(Jenkins.ADMINISTER);
         return jenkins.getPlugin(QuickDiskUsagePlugin.class);
     }
-
 }
