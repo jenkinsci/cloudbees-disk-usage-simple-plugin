@@ -71,9 +71,9 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     private long lastRunEnd = 0;
 
-    private final AtomicInteger progress = new AtomicInteger();
+    private transient final AtomicInteger progress = new AtomicInteger();
     
-    private final AtomicInteger total = new AtomicInteger();
+    private transient final AtomicInteger total = new AtomicInteger();
 
     @Override
     public void start() throws Exception {
