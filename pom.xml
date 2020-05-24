@@ -42,9 +42,10 @@
   <url>https://wiki.jenkins.io/display/JENKINS/CloudBees+Simple+Disk+Usage+Plugin</url>
 
   <properties>
-    <jenkins.version>2.60.3</jenkins.version>
+    <jenkins.version>2.138.4</jenkins.version>
     <java.level>8</java.level>
     <findbugs.failOnError>false</findbugs.failOnError>
+    <useBeta>true</useBeta>
   </properties>
 
   <licenses>
@@ -97,6 +98,14 @@
       <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>extended-read-permission</artifactId>
+      <version>3.2</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <pluginManagement>

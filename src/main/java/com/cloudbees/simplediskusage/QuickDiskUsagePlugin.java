@@ -140,7 +140,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     @RequirePOST
     public void doClean(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
         final Job job = jenkins.getItemByFullName(req.getParameter("job"), Job.class);
         Timer.get().submit(new Runnable() {
             @Override
@@ -188,7 +188,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     private void registerJobs(UsageComputation uc) throws IOException, InterruptedException {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
 
         // Remove useless entries for jobs
         for (JobDiskItem item : jobsUsages) {
@@ -206,7 +206,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     private void registerDirectories(UsageComputation uc) throws IOException, InterruptedException {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
         Map<File, String> directoriesToProcess = new HashMap<>();
         // Display JENKINS_HOME size
         directoriesToProcess.put(jenkins.getRootDir(), "JENKINS_HOME");
@@ -249,7 +249,7 @@ public class QuickDiskUsagePlugin extends Plugin {
             logger.info("Re-estimating disk usage");
             progress.set(0);
             lastRunStart = System.currentTimeMillis();
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
             try (ACLContext old = ACL.as(ACL.SYSTEM)) {
                 UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
                 registerJobs(uc);
@@ -273,7 +273,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
     private transient final Runnable computeDiskUsageOnStartup = new Runnable() {
         public void run() {
-            Jenkins jenkins = Jenkins.getInstance();
+            Jenkins jenkins = Jenkins.get();
             while (jenkins.getInitLevel() != InitMilestone.COMPLETED) {
                 try {
                     logger.log(Level.INFO, "Waiting for Jenkins to be up before computing disk usage");
