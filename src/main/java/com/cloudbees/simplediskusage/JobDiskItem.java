@@ -46,4 +46,14 @@ public class JobDiskItem extends DiskItem {
     public String getUrl() {
         return url;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
 }
