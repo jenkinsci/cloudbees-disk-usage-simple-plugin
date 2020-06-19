@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.50</version>
+    <version>4.3</version>
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
@@ -39,12 +39,11 @@
 
   <name>CloudBees Disk Usage Simple Plugin</name>
   <description>This is a simple disk usage plugin that calculates job disk usage while limiting the performance impact on the Jenkins master.</description>
-  <url>https://wiki.jenkins.io/display/JENKINS/CloudBees+Simple+Disk+Usage+Plugin</url>
+  <url>https://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin</url>
 
   <properties>
-    <jenkins.version>2.60.3</jenkins.version>
+    <jenkins.version>2.176.4</jenkins.version>
     <java.level>8</java.level>
-    <findbugs.failOnError>false</findbugs.failOnError>
   </properties>
 
   <licenses>
