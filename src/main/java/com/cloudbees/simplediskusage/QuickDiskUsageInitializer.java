@@ -37,7 +37,7 @@ public class QuickDiskUsageInitializer {
      */
     @Initializer(after = InitMilestone.JOB_LOADED)
     public static void initialize() {
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
         QuickDiskUsagePlugin plugin = jenkins.getPlugin(QuickDiskUsagePlugin.class);
         if (plugin == null) return;
         plugin.refreshDataOnStartup();

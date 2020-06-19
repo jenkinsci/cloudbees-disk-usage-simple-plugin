@@ -25,7 +25,7 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:s="/lib/form">
-    <l:layout title="${%Disk usage}" permission="${app.ADMINISTER}">
+    <l:layout title="${%Disk usage}" permission="${app.SYSTEM_READ}">
         <l:breadcrumb title="${%Disk usage}" href="."/>
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
