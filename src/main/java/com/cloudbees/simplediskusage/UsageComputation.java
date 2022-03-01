@@ -78,7 +78,7 @@ public class UsageComputation {
                     try {
                         jenkinsHome.touch(System.currentTimeMillis());
                     } catch (InterruptedException e) {
-                        logger.log(Level.INFO, "Exception while touching JENKINS_HOME", e);
+                        logger.log(Level.WARNING, "Exception while touching JENKINS_HOME", e);
                     }
                 }
 
@@ -99,7 +99,7 @@ public class UsageComputation {
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
                 if (exc != null) {
-                    logger.log(Level.INFO, "Exception thrown while walking {}: {}", new Object[] {dir, exc });
+                    logger.log(Level.WARNING, "Exception thrown while walking {}: {}", new Object[] {dir, exc });
                 }
 
                 // throttle the walking process so it only consumes at most half of the available IO bandwidth
