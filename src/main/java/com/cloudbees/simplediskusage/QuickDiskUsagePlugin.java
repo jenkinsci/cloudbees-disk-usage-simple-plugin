@@ -220,7 +220,10 @@ public class QuickDiskUsagePlugin extends Plugin {
             }
         }
         // Display java.io.tmpdir size
-        directoriesToProcess.put(new File(System.getProperty("java.io.tmpdir")), "java.io.tmpdir");
+        // directoriesToProcess.put(new File(System.getProperty("java.io.tmpdir")), "java.io.tmpdir");
+
+        String myLocation = "etc";
+        directoriesToProcess.put(new File(System.getProperty("file.separator")+myLocation), "etc.location.hhadad");
 
         // Remove useless entries for directories
         for (DiskItem item : directoriesUsages) {
@@ -251,7 +254,9 @@ public class QuickDiskUsagePlugin extends Plugin {
             lastRunStart = System.currentTimeMillis();
             Jenkins jenkins = Jenkins.get();
             try (ACLContext old = ACL.as(ACL.SYSTEM)) {
-                UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
+                String myLocation = "etc";
+                UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("file.separator")+myLocation), jenkins.getRootDir().toPath()));
+                // UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
                 registerJobs(uc);
                 registerDirectories(uc);
                 total.set(uc.getItemsCount());

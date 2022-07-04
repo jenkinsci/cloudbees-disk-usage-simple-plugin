@@ -3,6 +3,7 @@ package com.cloudbees.simplediskusage;
 import hudson.FilePath;
 import jenkins.model.Jenkins;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -16,6 +17,7 @@ import java.util.Stack;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * Compute disk usage of a list of paths. Results are published using
@@ -48,8 +50,28 @@ public class UsageComputation {
 
     public void compute() throws IOException {
         for (Path path : pathsToScan) {
-            computeUsage(path.toAbsolutePath());
+            String absolutePath = path.toAbsolutePath().toString();
+            String myPath = "/var/jenkins_home";
+            if (absolutePath.equals(myPath)){
+                Path dir = path.toAbsolutePath();
+                long pathDiskUsage = testme();
+                CompletionListener listener = listenerMap.get(dir);
+                if (listener != null) {
+                    listener.onCompleted(dir, pathDiskUsage);
+                }
+            }
+            else {
+                computeUsage(path.toAbsolutePath());
+            }
         }
+    }
+    
+    protected long testme() {
+        Jenkins jenkins = Jenkins.get();
+        File rd = jenkins.getRootDir();
+        long totalJenkins = rd.getTotalSpace();
+        long usableJenkins = rd.getUsableSpace();
+        return (totalJenkins - usableJenkins);
     }
 
     protected void computeUsage(Path path) throws IOException {
