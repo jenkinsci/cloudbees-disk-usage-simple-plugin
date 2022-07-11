@@ -208,53 +208,6 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
-    private String getRelatedFS(ArrayList<String> fileSystemList, String path){
-        // output would be the closest path to a list of filesystems
-        String relatedFS = "";
-        int tempSimilarityValue = -1;
-        
-        for (String singleFS: fileSystemList){
-            int similarityValue = path.compareTo(singleFS);
-            if (similarityValue == 0){
-                return singleFS;
-            }
-            else if (similarityValue > tempSimilarityValue){
-                relatedFS = singleFS;
-                tempSimilarityValue = similarityValue;
-            }
-        }
-        if (tempSimilarityValue >= 0){
-            return relatedFS;
-        }
-        return null;
-    }
-
-    private ArrayList<String> listFileSystems(ArrayList excludeFS) throws IOException{
-        // ArrayList fileStoreList;
-        ArrayList<String> fileStoreList = new ArrayList<String>();
-
-        // need to also handle Windows
-        for (FileStore fs: FileSystems.getDefault().getFileStores()) {
-            if (!excludeFS.contains(fs.type().toString())){
-                // println (fs.toString().split(" ")[0])
-                // fileStoreList += fs.toString().split(" ")[0];
-                fileStoreList.add(fs.toString().split(" ")[0]);
-            }
-        }
-        return fileStoreList;
-    }
-
-    private String jenkinsFS() throws IOException{
-        ArrayList<String> ignoreFSTypes = new ArrayList<String>(Arrays.asList("cgroup","proc"));
-        // String[] ignoreFSTypes = {"cgroup","proc"};
-        ArrayList<String> fileStoreList = listFileSystems(ignoreFSTypes);
-        
-        Jenkins jenkins = Jenkins.get();
-        String jenkinsRootDir = jenkins.getRootDir().toString();
-
-        return getRelatedFS(fileStoreList, jenkinsRootDir);
-    }
-
     private void registerDirectories(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.get();
         Map<File, String> directoriesToProcess = new HashMap<>();
@@ -275,9 +228,12 @@ public class QuickDiskUsagePlugin extends Plugin {
         // adding Jenkins root folder: https://stackoverflow.com/questions/14430825/how-can-i-get-a-list-of-all-mounted-filesystems-in-java-on-unix
         // https://stackoverflow.com/questions/10678363/find-the-directory-for-a-filestore
         // list of drives will be compared with current location of Jenkins, and only the source drive will be added to directoriesToProcess
-        String jenkinsFS = jenkinsFS();
-        directoriesToProcess.put(new File(jenkinsFS), "JENKINS_FS");
-
+        String jenkinsFS = UsageComputationFS.jenkinsFS();
+        if (!jenkinsFS.equals(jenkins.getRootDir().toPath().toString())){
+            // adding JENKINS_FS entry in case JENKINS_HOME is in different location
+            directoriesToProcess.put(new File(jenkinsFS), "JENKINS_FS");
+        }
+        
         // Remove useless entries for directories
         for (DiskItem item : directoriesUsages) {
             if (!item.getPath().exists() || !directoriesToProcess.containsKey(item.getPath())) {

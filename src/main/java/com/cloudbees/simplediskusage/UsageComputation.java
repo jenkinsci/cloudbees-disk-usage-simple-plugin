@@ -49,12 +49,26 @@ public class UsageComputation {
     }
 
     public void compute() throws IOException {
+        // list all paths
+        boolean isFS = false;
+        String jenkinsFS = "";
+        try {
+            String jenkinsFSExact = UsageComputationFS.jenkinsFSExactMatch();
+            jenkinsFS = UsageComputationFS.jenkinsFS();
+            if (jenkinsFSExact.equals(jenkinsFS)){
+                isFS = true;
+            }
+        } 
+        catch (Exception e) {
+            isFS = false;
+        }
+
         for (Path path : pathsToScan) {
             String absolutePath = path.toAbsolutePath().toString();
-            String myPath = "/var/jenkins_home";
-            if (absolutePath.equals(myPath)){
+            // String myPath = "/var/jenkins_home";
+            if ((isFS) && absolutePath.equals(jenkinsFS)){
                 Path dir = path.toAbsolutePath();
-                long pathDiskUsage = testme();
+                long pathDiskUsage = UsageComputationFS.jenkinsFSUsage();
                 CompletionListener listener = listenerMap.get(dir);
                 if (listener != null) {
                     listener.onCompleted(dir, pathDiskUsage);
@@ -64,14 +78,6 @@ public class UsageComputation {
                 computeUsage(path.toAbsolutePath());
             }
         }
-    }
-    
-    protected long testme() {
-        Jenkins jenkins = Jenkins.get();
-        File rd = jenkins.getRootDir();
-        long totalJenkins = rd.getTotalSpace();
-        long usableJenkins = rd.getUsableSpace();
-        return (totalJenkins - usableJenkins);
     }
 
     protected void computeUsage(Path path) throws IOException {
