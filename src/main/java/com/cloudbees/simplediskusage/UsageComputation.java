@@ -53,11 +53,8 @@ public class UsageComputation {
         boolean isFS = false;
         String jenkinsFS = "";
         try {
-            String jenkinsFSExact = UsageComputationFS.jenkinsFSExactMatch();
             jenkinsFS = UsageComputationFS.jenkinsFS();
-            if (jenkinsFSExact.equals(jenkinsFS)){
-                isFS = true;
-            }
+            isFS = true;
         } 
         catch (Exception e) {
             isFS = false;
@@ -67,6 +64,7 @@ public class UsageComputation {
             String absolutePath = path.toAbsolutePath().toString();
             // String myPath = "/var/jenkins_home";
             if ((isFS) && absolutePath.equals(jenkinsFS)){
+                logger.info("Disk path is: " + absolutePath);
                 Path dir = path.toAbsolutePath();
                 long pathDiskUsage = UsageComputationFS.jenkinsFSUsage();
                 CompletionListener listener = listenerMap.get(dir);
@@ -75,6 +73,7 @@ public class UsageComputation {
                 }
             }
             else {
+                logger.info("Disk path is: " + absolutePath);
                 computeUsage(path.toAbsolutePath());
             }
         }
