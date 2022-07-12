@@ -25,7 +25,6 @@ package com.cloudbees.simplediskusage;
 
 import hudson.Extension;
 import hudson.model.ManagementLink;
-import hudson.plugins.extendedread.SystemReadPermission;
 import hudson.security.Permission;
 import jenkins.model.Jenkins;
 import org.kohsuke.stapler.StaplerProxy;
@@ -54,8 +53,7 @@ public class QuickDiskUsageManagementLink extends ManagementLink implements Stap
 
     @Override
     public Permission getRequiredPermission() {
-        // replace with Jenkins.SYSTEM_READ after baseline >= 2.222
-        return SystemReadPermission.SYSTEM_READ;
+        return Jenkins.SYSTEM_READ;
     }
 
     /**
@@ -77,7 +75,7 @@ public class QuickDiskUsageManagementLink extends ManagementLink implements Stap
     @Override
     public Object getTarget() {
         Jenkins jenkins = Jenkins.get();
-        jenkins.checkPermission(SystemReadPermission.SYSTEM_READ);
+        jenkins.checkPermission(Jenkins.SYSTEM_READ);
         return jenkins.getPlugin(QuickDiskUsagePlugin.class);
     }
 }
