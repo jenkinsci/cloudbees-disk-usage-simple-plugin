@@ -205,6 +205,19 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
+    private void registerDirectoriesFS(UsageComputation uc) throws IOException, InterruptedException {
+        Map<File, String> directoriesToProcess = new HashMap<>();
+        // Display JENKINS_FS size
+        String empty = "";
+        File rootPath = new File("/"+empty);
+        directoriesToProcess.put(rootPath, "JENKINS_FS");
+
+        // Add or update entries for directories
+        for (Map.Entry<File, String> item : directoriesToProcess.entrySet()) {
+            uc.addListener(item.getKey().toPath(), new DirectoryUsageListener(item.getValue()));
+        }
+    }
+
     private void registerDirectories(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.get();
         Map<File, String> directoriesToProcess = new HashMap<>();
@@ -256,6 +269,15 @@ public class QuickDiskUsagePlugin extends Plugin {
                 registerDirectories(uc);
                 total.set(uc.getItemsCount());
                 uc.compute();
+                
+                String empty = "";
+                File rootPath = new File("/"+empty);
+                UsageComputation ucfs = new UsageComputation(Arrays.asList(rootPath.toPath()));
+                registerJobs(ucfs);
+                registerDirectoriesFS(ucfs);
+                total.set(ucfs.getItemsCount());
+                ucfs.computeFS();
+
                 logger.info("Finished re-estimating disk usage.");
                 lastRunEnd = System.currentTimeMillis();
             } catch (IOException | InterruptedException e) {
