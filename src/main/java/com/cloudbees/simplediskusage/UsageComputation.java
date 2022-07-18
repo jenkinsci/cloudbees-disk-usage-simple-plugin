@@ -53,22 +53,31 @@ public class UsageComputation {
         }
     }
 
-    public void computeFS() throws IOException {
+    public void computeFS() {
         for (Path path : pathsToScan) {
-            Path dir = path.toAbsolutePath();
-            long pathDiskUsage = jenkinsFSUsage();
-            CompletionListener listener = listenerMap.get(dir);
-            if (listener != null) {
-                listener.onCompleted(dir, pathDiskUsage);
+            try {
+                Path dir = path.toAbsolutePath();
+                long pathDiskUsage = jenkinsFSUsage();
+                CompletionListener listener = listenerMap.get(dir);
+                if (listener != null) {
+                    listener.onCompleted(dir, pathDiskUsage);
+                }
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "cloudbees-disk-usage-plugin: FS information could not get acquired.");
             }
         }
     }
 
     protected long jenkinsFSUsage() {
-        Jenkins jenkins = Jenkins.get();
-        File rd = jenkins.getRootDir();
+        File rd = Jenkins.get().getRootDir();
         long totalJenkins = rd.getTotalSpace();
         long usableJenkins = rd.getUsableSpace();
+        if (usableJenkins <= 0 || totalJenkins <= 0) {
+            // information unavailable. pointless to try.
+            logger.log(Level.WARNING, "cloudbees-disk-usage-plugin: JENKINS_HOME disk usage information isn't available.");
+            return -1;
+        }
         return (totalJenkins - usableJenkins);
     }
 
