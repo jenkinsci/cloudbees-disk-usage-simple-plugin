@@ -205,11 +205,24 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
+    private File getJenkinsBaseDirectory() throws NullPointerException {
+        Jenkins jenkins = Jenkins.get();
+        Path basePath = jenkins.getRootDir().toPath();
+        try {
+            while (basePath.getParent() != null) {
+                basePath = basePath.getParent();
+            }
+        }
+        catch (NullPointerException e){
+            logger.log(Level.WARNING, "cloudbees-disk-usage-plugin: Could not find Jenkins Base Directory");
+        }
+        return basePath.toFile();
+    }
+
     private void registerDirectoriesFS(UsageComputation uc) throws IOException, InterruptedException {
         Map<File, String> directoriesToProcess = new HashMap<>();
         // Display JENKINS_FS size
-        String empty = "";
-        File rootPath = new File("/"+empty);
+        File rootPath = getJenkinsBaseDirectory();
         directoriesToProcess.put(rootPath, "JENKINS_FS");
 
         // Add or update entries for directories
@@ -270,8 +283,7 @@ public class QuickDiskUsagePlugin extends Plugin {
                 total.set(uc.getItemsCount());
                 uc.compute();
                 
-                String empty = "";
-                File rootPath = new File("/"+empty);
+                File rootPath = getJenkinsBaseDirectory();
                 UsageComputation ucfs = new UsageComputation(Arrays.asList(rootPath.toPath()));
                 registerJobs(ucfs);
                 registerDirectoriesFS(ucfs);
