@@ -206,6 +206,8 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     private File getJenkinsBaseDirectory() throws NullPointerException {
+        // finds the lowest non-null value of parent.
+        // for example, would return "/" for "/var/jenkins_home"
         Jenkins jenkins = Jenkins.get();
         Path basePath = jenkins.getRootDir().toPath();
         try {
@@ -283,6 +285,7 @@ public class QuickDiskUsagePlugin extends Plugin {
                 total.set(uc.getItemsCount());
                 uc.compute();
                 
+                // Adds JENKINS_FS section with relevant disk usage info
                 File rootPath = getJenkinsBaseDirectory();
                 UsageComputation ucfs = new UsageComputation(Arrays.asList(rootPath.toPath()));
                 registerJobs(ucfs);

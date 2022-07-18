@@ -54,6 +54,7 @@ public class UsageComputation {
     }
 
     public void computeFS() {
+        // setting the disk space usage for the entire FS        
         for (Path path : pathsToScan) {
             try {
                 Path dir = path.toAbsolutePath();
