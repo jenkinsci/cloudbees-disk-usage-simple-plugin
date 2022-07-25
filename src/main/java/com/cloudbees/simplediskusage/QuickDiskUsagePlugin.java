@@ -246,7 +246,7 @@ public class QuickDiskUsagePlugin extends Plugin {
     private transient final Runnable computeDiskUsage = new Runnable() {
 
         public void run() {
-            logger.info("Re-estimating disk usage");
+            logger.fine("Re-estimating disk usage");
             progress.set(0);
             lastRunStart = System.currentTimeMillis();
             Jenkins jenkins = Jenkins.get();
@@ -256,10 +256,10 @@ public class QuickDiskUsagePlugin extends Plugin {
                 registerDirectories(uc);
                 total.set(uc.getItemsCount());
                 uc.compute();
-                logger.info("Finished re-estimating disk usage.");
+                logger.fine("Finished re-estimating disk usage.");
                 lastRunEnd = System.currentTimeMillis();
             } catch (IOException | InterruptedException e) {
-                logger.log(Level.INFO, "Unable to run disk usage check", e);
+                logger.log(Level.WARNING, "Unable to run disk usage check", e);
                 lastRunEnd = lastRunStart;
             }
             try {
@@ -276,7 +276,7 @@ public class QuickDiskUsagePlugin extends Plugin {
             Jenkins jenkins = Jenkins.get();
             while (jenkins.getInitLevel() != InitMilestone.COMPLETED) {
                 try {
-                    logger.log(Level.INFO, "Waiting for Jenkins to be up before computing disk usage");
+                    logger.log(Level.FINE, "Waiting for Jenkins to be up before computing disk usage");
                     Thread.sleep(3 * 60 * 1000);
                 } catch (InterruptedException e) {
                     return;
