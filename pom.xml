@@ -45,7 +45,7 @@
     <revision>0.11</revision>
     <changelist>-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/cloudbees-disk-usage-simple-plugin</gitHubRepo>
-    <jenkins.version>2.319.3</jenkins.version>
+    <jenkins.version>2.332.4</jenkins.version>
     <java.level>8</java.level>
   </properties>
 
