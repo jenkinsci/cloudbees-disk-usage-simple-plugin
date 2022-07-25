@@ -29,42 +29,48 @@
         <l:breadcrumb title="${%Disk usage}" href="."/>
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
-            <h1>${%Disk usage}</h1>
+            <div class="jenkins-app-bar">
+                <div class="jenkins-app-bar__content">
+                    <h1>
+                        ${%Disk usage}
+                    </h1>
+                </div>
+            </div>
             <st:include page="message.jelly" />
             <l:tabBar>
                 <l:tab name="${%Jobs}" active="true" href="."/>
                 <l:tab name="${%Directories}" href="./directories"/>
             </l:tabBar>
-            <table class="sortable pane bigtable">
+            <table class="jenkins-table sortable">
                 <thead>
                     <tr>
-                        <th class="pane-header" initialSortDir="down">${%Item name}</th>
-                        <th class="pane-header" style="text-align: right">${%Disk usage} (kB)</th>
-                        <th class="pane-header" style="text-align: right">${%Action}</th>
+                        <th initialSortDir="down">${%Item name}</th>
+                        <th style="text-align: right" >${%Disk usage} (kB)</th>
+                        <th class="jenkins-table__cell--tight" data-sort-disable="true">${%Action}</th>
                     </tr>
                 </thead>
                 <tbody>
                     <j:forEach var="e" items="${it.jobsUsages}">
                         <j:if test="${e.usage != 0}">
                             <tr>
-                                <td class="pane">
-                                    <a href="${rootURL}/${e.url}" class="model-link inside">${e.displayName}</a>
+                                <td>
+                                    <a href="${rootURL}/${e.url}" class="jenkins-table__link model-link inside">${e.displayName}</a>
                                 </td>
-                                <td class="pane" style="text-align: right">
+                                <td style="text-align: right">
                                     <j:choose>
                                         <j:when test="${e.usage > 0}">${e.usage}</j:when>
                                         <j:otherwise>N/A</j:otherwise>
                                     </j:choose>
                                 </td>
-                                <td class="pane" style="text-align: right">
-                                    <s:link href="clean/?job=${e.fullName}" post="true">run cleanup</s:link>
+                                <td>
+                                    <s:link href="clean/?job=${e.fullName}" post="true" clazz="jenkins-table__link">cleanup</s:link>
                                 </td>
                             </tr>
                         </j:if>
                     </j:forEach>
                 </tbody>
             </table>
-            <div style="padding:10px; margin-top: 10px; border: solid 1px #000">
+            <div style="padding:10px; margin-top: 10px;">
                 <h4>Background</h4>
                 <p>
                     Large amounts of disk are typically consumed by a job's build history as each entry in the build history will have an archived

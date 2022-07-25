@@ -29,25 +29,31 @@
         <l:breadcrumb title="${%Disk usage}" href="./directories"/>
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
-            <h1>${%Disk usage}</h1>
+            <div class="jenkins-app-bar">
+                <div class="jenkins-app-bar__content">
+                    <h1>
+                        ${%Disk usage}
+                    </h1>
+                </div>
+            </div>
             <st:include page="message.jelly" />
             <l:tabBar>
                 <l:tab name="${%Jobs}" href="."/>
                 <l:tab name="${%Directories}" active="true" href="./directories"/>
             </l:tabBar>
-            <table class="sortable pane bigtable">
+            <table class="jenkins-table sortable">
                 <thead>
                     <tr>
-                        <th class="pane-header" initialSortDir="down">${%Item name}</th>
-                        <th class="pane-header" style="text-align: right">${%Disk usage} (kB)</th>
+                        <th initialSortDir="down">${%Item name}</th>
+                        <th style="text-align: right">${%Disk usage} (kB)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <j:forEach var="e" items="${it.directoriesUsages}">
                         <j:if test="${e.usage != 0}">
                             <tr>
-                                <td class="pane">${e.displayName}</td>
-                                <td class="pane" style="text-align: right">
+                                <td>${e.displayName}</td>
+                                <td style="text-align: right">
                                     <j:choose>
                                         <j:when test="${e.usage > 0}">${e.usage}</j:when>
                                         <j:otherwise>N/A</j:otherwise>
