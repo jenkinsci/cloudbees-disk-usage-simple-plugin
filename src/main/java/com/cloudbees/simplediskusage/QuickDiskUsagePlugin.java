@@ -205,6 +205,34 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
+    private File getJenkinsBaseDirectory() throws NullPointerException {
+        // finds the lowest non-null value of parent.
+        // for example, would return "/" for "/var/jenkins_home"
+        Jenkins jenkins = Jenkins.get();
+        Path basePath = jenkins.getRootDir().toPath();
+        try {
+            while (basePath.getParent() != null) {
+                basePath = basePath.getParent();
+            }
+        }
+        catch (NullPointerException e){
+            logger.log(Level.WARNING, "cloudbees-disk-usage-plugin: Could not find Jenkins Base Directory");
+        }
+        return basePath.toFile();
+    }
+
+    private void registerDirectoriesFS(UsageComputation uc) throws IOException, InterruptedException {
+        Map<File, String> directoriesToProcess = new HashMap<>();
+        // Display JENKINS_FS size
+        File rootPath = getJenkinsBaseDirectory();
+        directoriesToProcess.put(rootPath, "JENKINS_FS");
+
+        // Add or update entries for directories
+        for (Map.Entry<File, String> item : directoriesToProcess.entrySet()) {
+            uc.addListener(item.getKey().toPath(), new DirectoryUsageListener(item.getValue()));
+        }
+    }
+
     private void registerDirectories(UsageComputation uc) throws IOException, InterruptedException {
         Jenkins jenkins = Jenkins.get();
         Map<File, String> directoriesToProcess = new HashMap<>();
@@ -256,7 +284,17 @@ public class QuickDiskUsagePlugin extends Plugin {
                 registerDirectories(uc);
                 total.set(uc.getItemsCount());
                 uc.compute();
+                
+                // Adds JENKINS_FS section with relevant disk usage info
+                File rootPath = getJenkinsBaseDirectory();
+                UsageComputation ucfs = new UsageComputation(Arrays.asList(rootPath.toPath()));
+                registerJobs(ucfs);
+                registerDirectoriesFS(ucfs);
+                total.set(ucfs.getItemsCount());
+                ucfs.computeFS();
+
                 logger.fine("Finished re-estimating disk usage.");
+
                 lastRunEnd = System.currentTimeMillis();
             } catch (IOException | InterruptedException e) {
                 logger.log(Level.WARNING, "Unable to run disk usage check", e);

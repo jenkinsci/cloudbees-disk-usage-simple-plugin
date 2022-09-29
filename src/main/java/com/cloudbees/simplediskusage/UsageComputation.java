@@ -3,6 +3,7 @@ package com.cloudbees.simplediskusage;
 import hudson.FilePath;
 import jenkins.model.Jenkins;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -50,6 +51,35 @@ public class UsageComputation {
         for (Path path : pathsToScan) {
             computeUsage(path.toAbsolutePath());
         }
+    }
+
+    public void computeFS() {
+        // setting the disk space usage for the entire FS        
+        for (Path path : pathsToScan) {
+            try {
+                Path dir = path.toAbsolutePath();
+                long pathDiskUsage = jenkinsFSUsage();
+                CompletionListener listener = listenerMap.get(dir);
+                if (listener != null) {
+                    listener.onCompleted(dir, pathDiskUsage);
+                }
+            }
+            catch (Exception e){
+                logger.log(Level.WARNING, "cloudbees-disk-usage-plugin: FS information could not get acquired.");
+            }
+        }
+    }
+
+    protected long jenkinsFSUsage() {
+        File rd = Jenkins.get().getRootDir();
+        long totalJenkins = rd.getTotalSpace();
+        long usableJenkins = rd.getUsableSpace();
+        if (usableJenkins <= 0 || totalJenkins <= 0) {
+            // information unavailable. pointless to try.
+            logger.log(Level.WARNING, "cloudbees-disk-usage-plugin: JENKINS_HOME disk usage information isn't available.");
+            return -1;
+        }
+        return (totalJenkins - usableJenkins);
     }
 
     protected void computeUsage(Path path) throws IOException {
