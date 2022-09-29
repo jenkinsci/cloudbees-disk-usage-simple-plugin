@@ -30,11 +30,11 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.19</version>
+    <version>4.42</version>
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
-  <version>0.11-SNAPSHOT</version>
+  <version>${changelist}</version>
   <packaging>hpi</packaging>
 
   <name>CloudBees Disk Usage Simple Plugin</name>
@@ -42,9 +42,10 @@
   <url>https://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin</url>
 
   <properties>
-    <jenkins.version>2.176.4</jenkins.version>
+    <changelist>999999-SNAPSHOT</changelist>
+    <gitHubRepo>jenkinsci/cloudbees-disk-usage-simple-plugin</gitHubRepo>
+    <jenkins.version>2.332.4</jenkins.version>
     <java.level>8</java.level>
-    <useBeta>true</useBeta>
   </properties>
 
   <licenses>
@@ -60,28 +61,48 @@
       <id>ndeloof</id>
       <name>Nicolas De Loof</name>
       <email>nicolas.deloof@gmail.com</email>
+      <roles>
+        <role>Maintainer (retired)</role>
+      </roles>
     </developer>
     <developer>
       <id>aheritier</id>
       <name>Arnaud Heritier</name>
       <email>aheritier@apache.org</email>
+      <roles>
+        <role>Maintainer (retired)</role>
+      </roles>
     </developer>
     <developer>
       <id>recena</id>
       <name>Manuel Recena</name>
       <email>recena@gmail.com</email>
+      <roles>
+        <role>Maintainer (retired)</role>
+      </roles>
     </developer>
     <developer>
       <id>ydubreuil</id>
       <name>Yoann Dubreuil</name>
+      <roles>
+        <role>Maintainer (retired)</role>
+      </roles>
+    </developer>
+    <developer>
+      <id>pierrebtz</id>
+      <name>Pierre Beitz</name>
+      <email>pibeitz@gmail.com</email>
+      <roles>
+        <role>Maintainer</role>
+      </roles>
     </developer>
   </developers>
 
   <scm>
-    <connection>scm:git:git@github.com:jenkinsci/cloudbees-disk-usage-simple-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/cloudbees-disk-usage-simple-plugin.git</developerConnection>
-    <url>http://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:https://github.com/${gitHubRepo}.git</developerConnection>
+    <url>https://github.com/${gitHubRepo}</url>
+    <tag>${scmTag}</tag>
   </scm>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
@@ -97,14 +118,6 @@
       <url>https://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>extended-read-permission</artifactId>
-      <version>3.2</version>
-    </dependency>
-  </dependencies>
 
   <build>
     <pluginManagement>

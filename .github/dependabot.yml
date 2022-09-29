@@ -13,3 +13,7 @@ updates:
   - dependency-name: org.jenkins-ci.main:jenkins-core
     versions:
     - ">= 0"
+- package-ecosystem: github-actions
+  directory: /
+  schedule:
+    interval: weekly
