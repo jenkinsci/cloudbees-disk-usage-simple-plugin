@@ -30,6 +30,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
   <l:header />
   <l:side-panel>
+    <l:tasks>
       <l:task href="${rootURL}/" icon="icon-up icon-md" title="${%Back to Dashboard}"/>
       <l:task href="${rootURL}/manage" icon="icon-setting icon-md" title="${%Manage Jenkins}"/>
       <l:task href="." icon="/plugin/cloudbees-disk-usage-simple/images/disk.png" title="${%Disk usage}"/>
@@ -43,5 +44,6 @@
               }
           </script>
       </j:if>
+    </l:tasks>
   </l:side-panel>
 </j:jelly>
