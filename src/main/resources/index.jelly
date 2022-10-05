@@ -25,5 +25,5 @@
 -->
 <?jelly escape-by-default='true'?>
 <div>
-    Alternative to disk-usage plugin, to compute in the background per job disk usage on jenkins master
+    Alternative to disk-usage plugin, to compute in the background per job disk usage on the Jenkins controller
 </div>

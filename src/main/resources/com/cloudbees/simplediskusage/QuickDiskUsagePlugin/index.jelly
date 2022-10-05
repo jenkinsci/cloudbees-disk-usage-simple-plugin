@@ -79,7 +79,7 @@
                 
                 <p> 
                     e.g. A 100MB WAR file is archived and 30 builds are retained in the build history - this will result in 3GB of
-                    usage for a single Jenkins job.  By default builds are retained forever - thus the storage requirement for Jenkins master is unbounded.
+                    usage for a single Jenkins job.  By default builds are retained forever - thus the storage requirement for the Jenkins controller is unbounded.
                 </p>
 
                 <h4>Limiting Disk Usage</h4>
