@@ -6,7 +6,7 @@
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/cloudbees-disk-usage-simple-plugin.svg?label=changelog)](https://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin/releases/latest)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/cloudbees-disk-usage-simple.svg?color=blue)](https://plugins.jenkins.io/cloudbees-disk-usage-simple)
 
-Simple disk usage plugin that calculates disk usage while limiting the performance impact on the Jenkins master.
+Simple disk usage plugin that calculates disk usage while limiting the performance impact on the Jenkins controller.
 
 # Features
 * uses Java 7 NIO directory walker API to calculate the size of jobs and 1st level directories under `$JENKINS_HOME`
