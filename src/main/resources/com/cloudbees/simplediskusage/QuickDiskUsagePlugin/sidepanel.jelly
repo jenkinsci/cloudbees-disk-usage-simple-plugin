@@ -38,7 +38,10 @@
         <l:task href="." onclick="return refresh(this)" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
           <script>
               function refresh(a) {
-                  new Ajax.Request("refresh");
+                  fetch("refresh", {
+                      method: "post",
+                      headers: crumb.wrap({}),
+                  });
                   hoverNotification('${%Refresh scheduled}',a.parentNode);
                   return true;
               }
