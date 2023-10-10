@@ -36,11 +36,18 @@ public class DiskItem implements Comparable<DiskItem> {
     private final String displayName;
     private final File path;
     private final Long usage;
+    private final Long count;
 
-    public DiskItem(String displayName, File path, Long usage) {
+    public DiskItem(String displayName, File path, Long usage, Long count) {
         this.displayName = displayName;
         this.path = path;
         this.usage = usage;
+        this.count = count;
+    }
+    
+    @Deprecated
+    public DiskItem(String displayName, File path, Long usage) {
+        this(displayName, path, usage, 0L);
     }
 
     public File getPath() {
@@ -49,6 +56,10 @@ public class DiskItem implements Comparable<DiskItem> {
 
     public Long getUsage() {
         return usage;
+    }
+
+    public Long getCount() {
+        return count;
     }
 
     public String getDisplayName() {

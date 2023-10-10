@@ -162,9 +162,13 @@ public class QuickDiskUsagePlugin extends Plugin {
             this.job = job;
         }
 
-        @Override
+        @Deprecated
         public void onCompleted(Path dir, long usage) {
-            JobDiskItem jobDiskItem = new JobDiskItem(job, usage / 1024);
+            onCompleted(dir, usage, 0);
+        }
+        @Override
+        public void onCompleted(Path dir, long usage, long count) {
+            JobDiskItem jobDiskItem = new JobDiskItem(job, usage / 1024, count);
             jobsUsages.remove(jobDiskItem);
             jobsUsages.add(jobDiskItem);
             progress.incrementAndGet();
@@ -178,9 +182,12 @@ public class QuickDiskUsagePlugin extends Plugin {
             this.displayName = displayName;
         }
 
-        @Override
         public void onCompleted(Path dir, long usage) {
-            DiskItem diskItem = new DiskItem(displayName, dir.toFile(), usage / 1024);
+            onCompleted(dir, usage, 0);
+        }
+        @Override
+        public void onCompleted(Path dir, long usage, long count) {
+            DiskItem diskItem = new DiskItem(displayName, dir.toFile(), usage / 1024, count);
             directoriesUsages.remove(diskItem);
             directoriesUsages.add(diskItem);
             progress.incrementAndGet();

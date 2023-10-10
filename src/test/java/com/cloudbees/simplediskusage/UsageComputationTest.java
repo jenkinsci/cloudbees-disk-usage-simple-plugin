@@ -18,7 +18,7 @@ public class UsageComputationTest {
         final UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(".")));
         uc.addListener(Paths.get("."), new UsageComputation.CompletionListener() {
             @Override
-            public void onCompleted(Path dir, long usage) {
+            public void onCompleted(Path dir, long usage, long count) {
                 notified.set(true);
                 testUsage.set(usage);
             }

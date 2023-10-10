@@ -46,6 +46,7 @@
                     <tr>
                         <th initialSortDir="down">${%Item name}</th>
                         <th style="text-align: right">${%Disk usage} (kB)</th>
+                        <th style="text-align: right">${%Count}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,6 +57,12 @@
                                 <td style="text-align: right">
                                     <j:choose>
                                         <j:when test="${e.usage > 0}">${e.usage}</j:when>
+                                        <j:otherwise>N/A</j:otherwise>
+                                    </j:choose>
+                                </td>
+                                <td style="text-align: right">
+                                    <j:choose>
+                                        <j:when test="${e.count > 0}">${e.count}</j:when>
                                         <j:otherwise>N/A</j:otherwise>
                                     </j:choose>
                                 </td>

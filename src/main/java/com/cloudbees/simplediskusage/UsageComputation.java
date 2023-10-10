@@ -28,7 +28,8 @@ import java.util.logging.Logger;
 public class UsageComputation {
 
     public interface CompletionListener {
-        void onCompleted(Path dir, long usage);
+        void onCompleted(Path dir, long usage, long count);
+
     }
 
     private final Map<Path, CompletionListener> listenerMap;
@@ -40,7 +41,7 @@ public class UsageComputation {
     }
 
     public void addListener(Path path, CompletionListener listener) {
-        listenerMap.put(path.toAbsolutePath(), listener);
+         listenerMap.put(path.toAbsolutePath(), listener);
     }
 
     public int getItemsCount() {
@@ -61,7 +62,7 @@ public class UsageComputation {
                 long pathDiskUsage = jenkinsFSUsage();
                 CompletionListener listener = listenerMap.get(dir);
                 if (listener != null) {
-                    listener.onCompleted(dir, pathDiskUsage);
+                    listener.onCompleted(dir, pathDiskUsage, 0);
                 }
             }
             catch (Exception e){
@@ -93,11 +94,15 @@ public class UsageComputation {
         final AtomicLong writableLastCheckTime = new AtomicLong(System.currentTimeMillis());
 
         final Stack<AtomicLong> computeStack = new Stack<>();
+        final Stack<AtomicLong> counterStack = new Stack<>();
+
         computeStack.push(new AtomicLong(0));
+        counterStack.push(new AtomicLong(0));
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 computeStack.push(new AtomicLong(0));
+                counterStack.push(new AtomicLong(0));
 
                 // check every 10 seconds that the process can write on JENKINS_HOME
                 // this will lock this thread if the filesystem is frozen
@@ -118,6 +123,7 @@ public class UsageComputation {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                 computeStack.peek().addAndGet(attrs.size());
+                counterStack.peek().getAndIncrement();
                 return FileVisitResult.CONTINUE;
             }
 
@@ -145,12 +151,14 @@ public class UsageComputation {
                 }
 
                 long pathDiskUsage = computeStack.pop().get();
+                long pathFileCount = counterStack.pop().get();
                 CompletionListener listener = listenerMap.get(dir);
                 if (listener != null) {
-                    listener.onCompleted(dir, pathDiskUsage);
+                    listener.onCompleted(dir, pathDiskUsage, pathFileCount);
                 }
 
                 computeStack.peek().addAndGet(pathDiskUsage);
+                counterStack.peek().addAndGet(pathFileCount);
                 return FileVisitResult.CONTINUE;
             }
         });
