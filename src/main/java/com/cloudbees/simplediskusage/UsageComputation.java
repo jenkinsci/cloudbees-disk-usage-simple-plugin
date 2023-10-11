@@ -29,7 +29,6 @@ public class UsageComputation {
 
     public interface CompletionListener {
         void onCompleted(Path dir, long usage, long count);
-
     }
 
     private final Map<Path, CompletionListener> listenerMap;
@@ -41,7 +40,7 @@ public class UsageComputation {
     }
 
     public void addListener(Path path, CompletionListener listener) {
-         listenerMap.put(path.toAbsolutePath(), listener);
+        listenerMap.put(path.toAbsolutePath(), listener);
     }
 
     public int getItemsCount() {
@@ -62,7 +61,7 @@ public class UsageComputation {
                 long pathDiskUsage = jenkinsFSUsage();
                 CompletionListener listener = listenerMap.get(dir);
                 if (listener != null) {
-                    listener.onCompleted(dir, pathDiskUsage, 0);
+                    listener.onCompleted(dir, pathDiskUsage, 0L);
                 }
             }
             catch (Exception e){

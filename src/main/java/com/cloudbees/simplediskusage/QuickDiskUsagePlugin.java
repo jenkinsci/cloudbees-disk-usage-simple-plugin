@@ -164,7 +164,7 @@ public class QuickDiskUsagePlugin extends Plugin {
 
         @Deprecated
         public void onCompleted(Path dir, long usage) {
-            onCompleted(dir, usage, 0);
+            onCompleted(dir, usage, 0L);
         }
         @Override
         public void onCompleted(Path dir, long usage, long count) {
