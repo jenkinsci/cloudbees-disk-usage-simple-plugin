@@ -30,7 +30,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.55</version>
+    <version>4.74</version>
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
@@ -44,8 +44,7 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/cloudbees-disk-usage-simple-plugin</gitHubRepo>
-    <jenkins.version>2.332.4</jenkins.version>
-    <java.level>8</java.level>
+    <jenkins.version>2.361.4</jenkins.version>
   </properties>
 
   <licenses>
