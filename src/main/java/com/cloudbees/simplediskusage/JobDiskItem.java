@@ -33,10 +33,15 @@ public class JobDiskItem extends DiskItem {
     private final String fullName;
     private final String url;
 
-    public JobDiskItem(Job<?, ?> job, Long size) {
-        super(job.getFullDisplayName(), job.getRootDir(), size);
+    public JobDiskItem(Job<?, ?> job, Long size, Long count) {
+        super(job.getFullDisplayName(), job.getRootDir(), size, count);
         this.fullName = job.getFullName();
         this.url = job.getUrl();
+    }
+
+    @Deprecated
+    public JobDiskItem(Job<?, ?> job, Long size) {
+        this(job, size, 0L);
     }
 
     public String getFullName() {
