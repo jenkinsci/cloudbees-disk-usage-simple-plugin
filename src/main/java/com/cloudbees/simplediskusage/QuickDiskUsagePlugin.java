@@ -36,7 +36,7 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import javax.inject.Singleton;
+import jakarta.inject.Singleton;
 import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
