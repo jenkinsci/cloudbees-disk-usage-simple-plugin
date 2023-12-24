@@ -1,7 +1,9 @@
 package com.cloudbees.simplediskusage;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +12,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class UsageComputationTest {
+
+    @Rule
+    public JenkinsRule jenkinsRule = new JenkinsRule();
+
     @Test
     public void compute() throws Exception {
         final AtomicBoolean notified = new AtomicBoolean(false);
