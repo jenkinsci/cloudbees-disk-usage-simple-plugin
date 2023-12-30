@@ -26,6 +26,7 @@ import java.util.logging.Logger;
  * tasks.
  */
 public class UsageComputation {
+    private static final FilePath CHECK_FILE= new FilePath(Jenkins.get().getRootPath(), "simpleDiskUsageCheck");
 
     public interface CompletionListener {
         void onCompleted(Path dir, long usage, long count);
@@ -97,22 +98,21 @@ public class UsageComputation {
 
         computeStack.push(new AtomicLong(0));
         counterStack.push(new AtomicLong(0));
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                 computeStack.push(new AtomicLong(0));
                 counterStack.push(new AtomicLong(0));
 
-                // check every 10 seconds that the process can write on JENKINS_HOME
+                // check every 10 seconds that the process can write a file in JENKINS_HOME
                 // this will lock this thread if the filesystem is frozen
                 // this is to speed up the FS freeze operation which is otherwise slowed down
                 if (System.currentTimeMillis() - writableLastCheckTime.get() > 10000) {
                     writableLastCheckTime.set(System.currentTimeMillis());
-                    FilePath jenkinsHome = Jenkins.get().getRootPath();
                     try {
-                        jenkinsHome.touch(System.currentTimeMillis());
+                        CHECK_FILE.touch(System.currentTimeMillis());
                     } catch (InterruptedException e) {
-                        logger.log(Level.WARNING, "Exception while touching JENKINS_HOME", e);
+                        logger.log(Level.WARNING, "Exception while touching the checkfile", e);
                     }
                 }
 
