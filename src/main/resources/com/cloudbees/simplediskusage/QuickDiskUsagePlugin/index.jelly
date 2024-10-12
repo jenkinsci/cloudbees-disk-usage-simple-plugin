@@ -59,13 +59,13 @@
                                 </td>
                                 <td style="text-align: right">
                                     <j:choose>
-                                        <j:when test="${e.usage > 0}">${e.usage}</j:when>
+                                        <j:when test="${e.usage > 0}"><code>${e.usage}</code></j:when>
                                         <j:otherwise>N/A</j:otherwise>
                                     </j:choose>
                                 </td>
                                 <td style="text-align: right">
                                     <j:choose>
-                                        <j:when test="${e.count > 0}">${e.count}</j:when>
+                                        <j:when test="${e.count > 0}"><code>${e.count}</code></j:when>
                                         <j:otherwise>N/A</j:otherwise>
                                     </j:choose>
                                 </td>
