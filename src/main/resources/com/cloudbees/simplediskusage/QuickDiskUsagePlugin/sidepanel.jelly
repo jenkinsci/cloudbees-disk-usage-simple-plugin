@@ -27,25 +27,16 @@
   Side panel for the build view.
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout">
+<j:jelly xmlns:j="jelly:core" xmlns:l="/lib/layout" xmlns:st="jelly:stapler">
   <l:header />
   <l:side-panel>
     <l:tasks>
       <l:task href="${rootURL}/" icon="icon-up icon-md" title="${%Back to Dashboard}"/>
       <l:task href="${rootURL}/manage" icon="icon-setting icon-md" title="${%Manage Jenkins}"/>
       <l:task href="." icon="/plugin/cloudbees-disk-usage-simple/images/disk.png" title="${%Disk usage}"/>
-      <j:if test="${not it.running}">
-        <l:task href="." onclick="return refresh(this)" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
-          <script>
-              function refresh(a) {
-                  fetch("refresh", {
-                      method: "post",
-                      headers: crumb.wrap({}),
-                  });
-                  hoverNotification('${%Refresh scheduled}',a.parentNode);
-                  return true;
-              }
-          </script>
+      <st:adjunct includes="com.cloudbees.simplediskusage.QuickDiskUsagePlugin.refresh"/>
+        <j:if test="${not it.running}">
+        <l:task href="." data-callback="refresh" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
       </j:if>
     </l:tasks>
   </l:side-panel>
