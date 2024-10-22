@@ -34,9 +34,9 @@
       <l:task href="${rootURL}/" icon="icon-up icon-md" title="${%Back to Dashboard}"/>
       <l:task href="${rootURL}/manage" icon="icon-setting icon-md" title="${%Manage Jenkins}"/>
       <l:task href="." icon="/plugin/cloudbees-disk-usage-simple/images/disk.png" title="${%Disk usage}"/>
-      <st:adjunct includes="com.cloudbees.simplediskusage.QuickDiskUsagePlugin.refresh"/>
         <j:if test="${not it.running}">
-        <l:task href="." data-callback="refresh" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
+          <st:adjunct includes="com.cloudbees.simplediskusage.QuickDiskUsagePlugin.refresh-disk-usage"/>
+          <l:task href="." data-callback="refreshDiskUsage" icon="icon-refresh icon-md" title="${%Refresh disk usage}" post="true"/>
       </j:if>
     </l:tasks>
   </l:side-panel>
