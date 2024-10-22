@@ -11,20 +11,3 @@ function refreshDiskUsage(a) {
 
     hoverNotification('Refresh scheduled', a.parentNode);
 }
-
-//
-// function refreshDiskUsage(a, event) {
-//
-//     console.log("Refreshing disk usage");
-//
-//     fetch("refresh", {
-//         method: "POST",
-//         headers: crumb.wrap({
-//             "Content-Type": "application/x-www-form-urlencoded",
-//         }),
-//     });
-//     event.preventDefault();
-//
-//     hoverNotification('Refresh scheduled', a.parentNode);
-//     // return true;
-// }
