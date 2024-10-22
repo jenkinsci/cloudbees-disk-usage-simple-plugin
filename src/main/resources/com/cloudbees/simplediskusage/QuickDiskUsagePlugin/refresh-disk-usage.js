@@ -1,7 +1,7 @@
 function refreshDiskUsage(a) {
 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "refresh", true); // true means asynchronous
+    xhr.open("POST", "refresh", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     var headers = crumb.wrap({});
@@ -11,3 +11,20 @@ function refreshDiskUsage(a) {
 
     hoverNotification('Refresh scheduled', a.parentNode);
 }
+
+//
+// function refreshDiskUsage(a, event) {
+//
+//     console.log("Refreshing disk usage");
+//
+//     fetch("refresh", {
+//         method: "POST",
+//         headers: crumb.wrap({
+//             "Content-Type": "application/x-www-form-urlencoded",
+//         }),
+//     });
+//     event.preventDefault();
+//
+//     hoverNotification('Refresh scheduled', a.parentNode);
+//     // return true;
+// }
