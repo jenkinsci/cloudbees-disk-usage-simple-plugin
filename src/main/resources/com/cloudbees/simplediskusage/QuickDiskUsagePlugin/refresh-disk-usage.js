@@ -1,13 +1,12 @@
-function refreshDiskUsage(a) {
+function refreshDiskUsage(a, event) {
 
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "refresh", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    var headers = crumb.wrap({});
-    xhr.setRequestHeader("Jenkins-Crumb", headers['Jenkins-Crumb']);
-
-    xhr.send();
+    fetch("refresh", {
+        method: "POST",
+        headers: crumb.wrap({
+            "Content-Type": "application/x-www-form-urlencoded",
+        }),
+    });
 
     hoverNotification('Refresh scheduled', a.parentNode);
+    console.log("event");
 }
