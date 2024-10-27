@@ -8,5 +8,4 @@ function refreshDiskUsage(a, event) {
     });
 
     hoverNotification('Refresh scheduled', a.parentNode);
-    console.log("event");
 }
