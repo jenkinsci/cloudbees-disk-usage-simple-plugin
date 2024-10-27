@@ -1,4 +1,4 @@
-function refreshDiskUsage(a, event) {
+function refreshDiskUsage(a) {
 
     fetch("refresh", {
         method: "POST",
