@@ -4,9 +4,9 @@ function refreshDiskUsage(a, ev) {
         headers: crumb.wrap({}),
     }).then((rsp) => {
         if (rsp.ok) {
-            hoverNotification("Refresh scheduled", a.parentNode);
+            notificationBar.show("Refresh scheduled", notificationBar.SUCCESS);
         } else {
-            hoverNotification("Failed to schedule refresh", a.parentNode);
+            notificationBar.show("Failed to schedule refresh", notificationBar.ERROR);
         }
     });
     ev.preventDefault();
