@@ -1,9 +1,13 @@
-function refreshDiskUsage(a) {
-
+function refreshDiskUsage(a, ev) {
     fetch("refresh", {
-        method: "POST",
+        method: "post",
         headers: crumb.wrap({}),
+    }).then((rsp) => {
+        if (rsp.ok) {
+            hoverNotification("Refresh scheduled", a.parentNode);
+        } else {
+            hoverNotification("Failed to schedule refresh", a.parentNode);
+        }
     });
-
-    hoverNotification('Refresh scheduled', a.parentNode);
+    ev.preventDefault();
 }
