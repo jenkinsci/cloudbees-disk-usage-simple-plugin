@@ -32,12 +32,12 @@ import hudson.security.ACLContext;
 import hudson.util.NamingThreadFactory;
 import jenkins.model.Jenkins;
 import jenkins.util.Timer;
-import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.StaplerRequest2;
+import org.kohsuke.stapler.StaplerResponse2;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import jakarta.inject.Singleton;
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -133,13 +133,13 @@ public class QuickDiskUsagePlugin extends Plugin {
     }
 
     @RequirePOST
-    public void doRefresh(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
+    public void doRefresh(StaplerRequest2 req, StaplerResponse2 res) throws IOException, ServletException {
         refreshData();
         res.forwardToPreviousPage(req);
     }
 
     @RequirePOST
-    public void doClean(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
+    public void doClean(StaplerRequest2 req, StaplerResponse2 res) throws IOException, ServletException {
         Jenkins jenkins = Jenkins.get();
         final Job job = jenkins.getItemByFullName(req.getParameter("job"), Job.class);
         Timer.get().submit(new Runnable() {
