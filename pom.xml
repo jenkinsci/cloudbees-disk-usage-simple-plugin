@@ -30,7 +30,8 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.88</version>
+    <version>5.7</version>
+    <relativePath />
   </parent>
 
   <artifactId>cloudbees-disk-usage-simple</artifactId>
@@ -44,7 +45,7 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/cloudbees-disk-usage-simple-plugin</gitHubRepo>
-    <jenkins.version>2.452.4</jenkins.version>
+    <jenkins.version>2.479.3</jenkins.version>
   </properties>
 
   <licenses>
@@ -54,48 +55,6 @@
       <distribution>repo</distribution>
     </license>
   </licenses>
-
-  <developers>
-    <developer>
-      <id>ndeloof</id>
-      <name>Nicolas De Loof</name>
-      <email>nicolas.deloof@gmail.com</email>
-      <roles>
-        <role>Maintainer (retired)</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>aheritier</id>
-      <name>Arnaud Heritier</name>
-      <email>aheritier@apache.org</email>
-      <roles>
-        <role>Maintainer (retired)</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>recena</id>
-      <name>Manuel Recena</name>
-      <email>recena@gmail.com</email>
-      <roles>
-        <role>Maintainer (retired)</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>ydubreuil</id>
-      <name>Yoann Dubreuil</name>
-      <roles>
-        <role>Maintainer (retired)</role>
-      </roles>
-    </developer>
-    <developer>
-      <id>pierrebtz</id>
-      <name>Pierre Beitz</name>
-      <email>pibeitz@gmail.com</email>
-      <roles>
-        <role>Maintainer</role>
-      </roles>
-    </developer>
-  </developers>
 
   <scm>
     <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
