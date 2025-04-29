@@ -23,6 +23,7 @@
  */
 package com.cloudbees.simplediskusage;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.ManagementLink;
 import hudson.security.Permission;
@@ -33,7 +34,7 @@ import org.kohsuke.stapler.StaplerProxy;
 public class QuickDiskUsageManagementLink extends ManagementLink implements StaplerProxy {
     @Override
     public String getIconFileName() {
-        return "/plugin/cloudbees-disk-usage-simple/images/disk.png";
+        return "symbol-pie-chart-outline plugin-ionicons-api";
     }
 
     @Override
@@ -56,17 +57,10 @@ public class QuickDiskUsageManagementLink extends ManagementLink implements Stap
         return Jenkins.SYSTEM_READ;
     }
 
-    /**
-     * Name of the category for this management link. Exists so that plugins with core dependency pre-dating the version
-     * when this was introduced can define a category.
-     *
-     * TODO when the core version is &gt;2.226 change this to override {@code getCategory()} instead
-     *
-     * @return name of the desired category, one of the enum values of Category, e.g. {@code STATUS}.
-     * @since 2.226 of Jenkins core
-     */
-    public String getCategoryName() {
-        return "STATUS";
+    @NonNull
+    @Override
+    public Category getCategory() {
+        return Category.STATUS;
     }
 
     /**
