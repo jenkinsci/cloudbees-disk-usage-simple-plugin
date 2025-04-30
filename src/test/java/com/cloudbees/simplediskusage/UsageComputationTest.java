@@ -1,40 +1,43 @@
 package com.cloudbees.simplediskusage;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class UsageComputationTest {
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
+@WithJenkins
+class UsageComputationTest {
+
+    private JenkinsRule j;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        j = rule;
+    }
 
     @Test
-    public void compute() throws Exception {
+    void compute() throws Exception {
         final AtomicBoolean notified = new AtomicBoolean(false);
         final AtomicLong testUsage = new AtomicLong(0);
         final AtomicLong testCount = new AtomicLong(0);
 
-        final UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(".")));
-        uc.addListener(Paths.get("."), new UsageComputation.CompletionListener() {
-            @Override
-            public void onCompleted(Path dir, long usage, long count) {
-                notified.set(true);
-                testUsage.set(usage);
-                testCount.set(count);
-            }
+        final UsageComputation uc = new UsageComputation(List.of(Paths.get(".")));
+        uc.addListener(Paths.get("."), (dir, usage, count) -> {
+            notified.set(true);
+            testUsage.set(usage);
+            testCount.set(count);
         });
         uc.compute();
 
-        Assert.assertTrue(notified.get());
-        Assert.assertTrue(testUsage.get() >  0);
-        Assert.assertTrue(testCount.get() > 0);
+        assertTrue(notified.get());
+        assertTrue(testUsage.get() >  0);
+        assertTrue(testCount.get() > 0);
     }
 }
