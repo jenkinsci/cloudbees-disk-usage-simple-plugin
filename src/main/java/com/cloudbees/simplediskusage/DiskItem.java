@@ -66,6 +66,15 @@ public class DiskItem implements Comparable<DiskItem> {
         return displayName;
     }
 
+    /**
+     * Returns the usage value in MB
+     * @return disk usage in MB
+     */
+    public String getUsageInMB() {
+        float mbValue = usage / 1024.0f;
+        return String.format("%.1f", mbValue);
+    }
+
     @Override
     public int compareTo(DiskItem o) {
         return Objects.compare(
