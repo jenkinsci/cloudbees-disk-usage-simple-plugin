@@ -45,7 +45,7 @@
                 <thead>
                     <tr>
                         <th initialSortDir="down">${%Item name}</th>
-                        <th style="text-align: right">${%Disk usage} (kB)</th>
+                        <th style="text-align: right">${%Disk usage} (MB)</th>
                         <th style="text-align: right">${%Count}</th>
                     </tr>
                 </thead>

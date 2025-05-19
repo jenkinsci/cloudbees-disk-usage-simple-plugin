@@ -168,7 +168,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
         @Override
         public void onCompleted(Path dir, long usage, long count) {
-            JobDiskItem jobDiskItem = new JobDiskItem(job, usage / 1024, count);
+            JobDiskItem jobDiskItem = new JobDiskItem(job, usage / (1024 * 1024), count);
             jobsUsages.remove(jobDiskItem);
             jobsUsages.add(jobDiskItem);
             progress.incrementAndGet();
@@ -187,7 +187,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
         @Override
         public void onCompleted(Path dir, long usage, long count) {
-            DiskItem diskItem = new DiskItem(displayName, dir.toFile(), usage / 1024, count);
+            DiskItem diskItem = new DiskItem(displayName, dir.toFile(), usage / (1024 * 1024), count);
             directoriesUsages.remove(diskItem);
             directoriesUsages.add(diskItem);
             progress.incrementAndGet();
