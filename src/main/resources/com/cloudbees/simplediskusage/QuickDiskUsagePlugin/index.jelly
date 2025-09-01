@@ -45,7 +45,7 @@
                 <thead>
                     <tr>
                         <th initialSortDir="down">${%Item name}</th>
-                        <th style="text-align: right" >${%Disk usage} (kB)</th>
+                        <th style="text-align: right" >${%Disk usage} (MB)</th>
                         <th style="text-align: right" >${%Amount}</th>
                         <th class="jenkins-table__cell--tight" data-sort-disable="true">${%Action}</th>
                     </tr>
@@ -59,7 +59,7 @@
                                 </td>
                                 <td style="text-align: right">
                                     <j:choose>
-                                        <j:when test="${e.usage > 0}"><code>${e.usage}</code></j:when>
+                                        <j:when test="${e.usage > 0}"><code>${e.usageInMB}</code></j:when>
                                         <j:otherwise>N/A</j:otherwise>
                                     </j:choose>
                                 </td>
