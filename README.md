@@ -1,6 +1,6 @@
 # CloudBees Disk Usage Simple Plugin
 
-[![Build Status](https://ci.jenkins.io/job/Plugins/job/cloudbees-disk-usage-simple-plugin/job/master/badge/icon)](https://ci.jenkins.io/job/Plugins/job/cloudbees-disk-usage-simple-plugin/job/master/)
+[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fcloudbees-disk-usage-simple-plugin%2Fmaster)](https://ci.jenkins.io/job/Plugins/job/cloudbees-disk-usage-simple-plugin/job/master/)
 [![Contributors](https://img.shields.io/github/contributors/jenkinsci/cloudbees-disk-usage-simple-plugin.svg)](https://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin/graphs/contributors)
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/cloudbees-disk-usage-simple.svg)](https://plugins.jenkins.io/cloudbees-disk-usage-simple)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/cloudbees-disk-usage-simple-plugin.svg?label=changelog)](https://github.com/jenkinsci/cloudbees-disk-usage-simple-plugin/releases/latest)
