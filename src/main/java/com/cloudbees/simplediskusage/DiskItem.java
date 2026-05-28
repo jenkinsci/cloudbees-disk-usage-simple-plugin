@@ -23,6 +23,9 @@
  */
 package com.cloudbees.simplediskusage;
 
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
+
 import java.io.File;
 import java.util.Objects;
 
@@ -31,6 +34,7 @@ import java.util.Objects;
  *
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@ExportedBean
 public class DiskItem implements Comparable<DiskItem> {
 
     private final String displayName;
@@ -54,16 +58,24 @@ public class DiskItem implements Comparable<DiskItem> {
         return path;
     }
 
+    @Exported(name = "usageKB")
     public Long getUsage() {
         return usage;
     }
 
+    @Exported
     public Long getCount() {
         return count;
     }
 
+    @Exported
     public String getDisplayName() {
         return displayName;
+    }
+
+    @Exported
+    public String getPathString() {
+        return path.getAbsolutePath();
     }
 
     /**

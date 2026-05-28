@@ -24,6 +24,7 @@
 package com.cloudbees.simplediskusage;
 
 import hudson.model.Job;
+import org.kohsuke.stapler.export.Exported;
 
 /**
  * A job directory path on the disk with its usage information
@@ -44,10 +45,12 @@ public class JobDiskItem extends DiskItem {
         this(job, size, 0L);
     }
 
+    @Exported
     public String getFullName() {
         return fullName;
     }
 
+    @Exported
     public String getUrl() {
         return url;
     }
