@@ -25,7 +25,9 @@ package com.cloudbees.simplediskusage;
 
 import hudson.*;
 import hudson.init.InitMilestone;
+import hudson.model.Api;
 import hudson.model.Job;
+import hudson.model.ModelObject;
 import hudson.model.TopLevelItem;
 import hudson.security.ACL;
 import hudson.security.ACLContext;
@@ -34,6 +36,8 @@ import jenkins.model.Jenkins;
 import jenkins.util.Timer;
 import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.StaplerResponse2;
+import org.kohsuke.stapler.export.Exported;
+import org.kohsuke.stapler.export.ExportedBean;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
 import jakarta.inject.Singleton;
@@ -52,9 +56,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@ExportedBean
 @Extension
 @Singleton
-public class QuickDiskUsagePlugin extends Plugin {
+public class QuickDiskUsagePlugin extends Plugin implements ModelObject {
 
     public static final int QUIET_PERIOD = 15 * 60 * 1000;
 
@@ -88,6 +93,15 @@ public class QuickDiskUsagePlugin extends Plugin {
         }
     }
 
+    @Override
+    public String getDisplayName() {
+        return "Disk Usage";
+    }
+
+    public Api getApi() {
+        return new Api(this);
+    }
+
     public void refreshData() {
         if (!isRunning()) {
             singleExecutorService.execute(computeDiskUsage);
@@ -98,6 +112,7 @@ public class QuickDiskUsagePlugin extends Plugin {
          singleExecutorService.execute(computeDiskUsageOnStartup);
     }
 
+    @Exported(inline = true)
     public CopyOnWriteArrayList<DiskItem> getDirectoriesUsages() throws IOException {
         if (System.currentTimeMillis() - lastRunEnd >= QUIET_PERIOD) {
             refreshData();
@@ -105,6 +120,7 @@ public class QuickDiskUsagePlugin extends Plugin {
         return directoriesUsages;
     }
 
+    @Exported(inline = true)
     public CopyOnWriteArrayList<JobDiskItem> getJobsUsages() throws IOException {
         if (System.currentTimeMillis() - lastRunEnd >= QUIET_PERIOD) {
             refreshData();
@@ -112,10 +128,12 @@ public class QuickDiskUsagePlugin extends Plugin {
         return jobsUsages;
     }
 
+    @Exported
     public long getLastRunStart() {
         return lastRunStart;
     }
 
+    @Exported
     public long getLastRunEnd() {
         return lastRunEnd;
     }
