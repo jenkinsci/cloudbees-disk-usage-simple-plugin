@@ -25,14 +25,14 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:s="/lib/form">
-    <l:layout title="${%Disk usage}" permission="${app.SYSTEM_READ}">
-        <l:breadcrumb title="${%Disk usage}" href="."/>
+    <l:layout title="${%disk_usage}" permission="${app.SYSTEM_READ}">
+        <l:breadcrumb title="${%disk_usage}" href="."/>
         <st:include page="sidepanel.jelly" />
         <l:main-panel>
             <div class="jenkins-app-bar">
                 <div class="jenkins-app-bar__content">
                     <h1>
-                        ${%Disk usage}
+                        ${%disk_usage}
                     </h1>
                 </div>
             </div>
@@ -44,9 +44,9 @@
             <table class="jenkins-table sortable">
                 <thead>
                     <tr>
-                        <th initialSortDir="down">${%Item name}</th>
-                        <th style="text-align: right" >${%Disk usage} (MB)</th>
-                        <th style="text-align: right" >${%Amount}</th>
+                        <th initialSortDir="down">${%item_name}</th>
+                        <th style="text-align: right" >${%disk_usage} (MB)</th>
+                        <th style="text-align: right" >${%files}</th>
                         <th class="jenkins-table__cell--tight" data-sort-disable="true">${%Action}</th>
                     </tr>
                 </thead>
