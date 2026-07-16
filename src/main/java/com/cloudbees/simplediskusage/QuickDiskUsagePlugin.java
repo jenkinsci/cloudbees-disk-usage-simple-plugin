@@ -139,7 +139,7 @@ public class QuickDiskUsagePlugin extends Plugin implements ModelObject {
     }
 
     public String getSince() {
-        return Util.getPastTimeString(System.currentTimeMillis() - lastRunEnd);
+        return Util.getTimeSpanString(System.currentTimeMillis() - lastRunEnd);
     }
 
     public String getDuration() {
@@ -303,7 +303,7 @@ public class QuickDiskUsagePlugin extends Plugin implements ModelObject {
             progress.set(0);
             lastRunStart = System.currentTimeMillis();
             Jenkins jenkins = Jenkins.get();
-            try (ACLContext old = ACL.as(ACL.SYSTEM)) {
+            try (ACLContext old = ACL.as2(ACL.SYSTEM2)) {
                 UsageComputation uc = new UsageComputation(Arrays.asList(Paths.get(System.getProperty("java.io.tmpdir")), jenkins.getRootDir().toPath()));
                 registerJobs(uc);
                 registerDirectories(uc);
