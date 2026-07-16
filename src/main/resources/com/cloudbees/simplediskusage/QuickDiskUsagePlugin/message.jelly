@@ -39,7 +39,7 @@
                 <br/>
             </j:when>
             <j:otherwise>
-                Computed ${it.since} ago. Took ${it.duration}.
+                ${%prefix_since} ${it.since} ${%postfix_since}. ${%prefix_duration} ${it.duration}.
             </j:otherwise>
         </j:choose>
     </p>
