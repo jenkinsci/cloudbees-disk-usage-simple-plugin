@@ -25,52 +25,45 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout">
-    <l:layout title="${%disk_usage}" permission="${app.SYSTEM_READ}">
-        <l:breadcrumb title="${%disk_usage}" href="./directories"/>
-        <st:include page="sidepanel.jelly" />
-        <l:main-panel>
-            <div class="jenkins-app-bar">
-                <div class="jenkins-app-bar__content">
-                    <h1>
-                        ${%disk_usage}
-                    </h1>
-                </div>
-            </div>
-            <st:include page="message.jelly" />
-            <l:tabBar>
-                <l:tab name="${%Jobs}" href="."/>
-                <l:tab name="${%Directories}" active="true" href="./directories"/>
-            </l:tabBar>
-            <table class="jenkins-table sortable">
-                <thead>
-                    <tr>
-                        <th initialSortDir="down">${%item_name}</th>
-                        <th style="text-align: right">${%disk_usage} (MB)</th>
-                        <th style="text-align: right">${%files}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <j:forEach var="e" items="${it.directoriesUsages}">
-                        <j:if test="${e.usage != 0}">
-                            <tr>
-                                <td>${e.displayName}</td>
-                                <td style="text-align: right">
-                                    <j:choose>
-                                        <j:when test="${e.usage > 0}">${e.usageInMB}</j:when>
-                                        <j:otherwise>N/A</j:otherwise>
-                                    </j:choose>
-                                </td>
-                                <td style="text-align: right">
-                                    <j:choose>
-                                        <j:when test="${e.count > 0}">${e.count}</j:when>
-                                        <j:otherwise>N/A</j:otherwise>
-                                    </j:choose>
-                                </td>
-                            </tr>
-                        </j:if>
-                    </j:forEach>
-                </tbody>
-            </table>
-        </l:main-panel>
-    </l:layout>
+    <j:set var="header">
+        <st:include page="header.jelly" />
+    </j:set>
+
+    <l:settings-subpage permission="${app.SYSTEM_READ}" header="${header}" title="${%Disk Usage Directories}">
+        <st:include page="message.jelly" />
+        <l:tabBar>
+            <l:tab name="${%Jobs}" href="."/>
+            <l:tab name="${%Directories}" active="true" href="./directories"/>
+        </l:tabBar>
+        <table class="jenkins-table sortable">
+            <thead>
+                <tr>
+                    <th initialSortDir="down">${%item_name}</th>
+                    <th style="text-align: right">${%disk_usage} (MB)</th>
+                    <th style="text-align: right">${%files}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <j:forEach var="e" items="${it.directoriesUsages}">
+                    <j:if test="${e.usage != 0}">
+                        <tr>
+                            <td>${e.displayName}</td>
+                            <td style="text-align: right">
+                                <j:choose>
+                                    <j:when test="${e.usage > 0}">${e.usageInMB}</j:when>
+                                    <j:otherwise>N/A</j:otherwise>
+                                </j:choose>
+                            </td>
+                            <td style="text-align: right">
+                                <j:choose>
+                                    <j:when test="${e.count > 0}">${e.count}</j:when>
+                                    <j:otherwise>N/A</j:otherwise>
+                                </j:choose>
+                            </td>
+                        </tr>
+                    </j:if>
+                </j:forEach>
+            </tbody>
+        </table>
+    </l:settings-subpage>
 </j:jelly>

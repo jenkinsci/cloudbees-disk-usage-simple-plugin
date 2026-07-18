@@ -11,3 +11,7 @@ function refreshDiskUsage(a, ev) {
     });
     ev.preventDefault();
 }
+
+Behaviour.specify("#refresh-disk-usage", "refresh-disk-usage", 0, function(button) {
+    button.addEventListener("click", refreshDiskUsage);
+});

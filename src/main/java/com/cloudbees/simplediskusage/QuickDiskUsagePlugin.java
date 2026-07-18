@@ -288,12 +288,22 @@ public class QuickDiskUsagePlugin extends Plugin implements ModelObject {
         }
     }
 
+    // unused
     public int getItemsCount() {
         return total.intValue();
     }
 
+    /**
+     * Progress in percentage of the total number of items to process. Returns 100 if there is no item to process.
+     *
+     * @return progress in percentage of the total number of items to process
+     */
+    // Jelly only
     public int getProgress() {
-        return progress.intValue();
+        if (total.intValue() == 0) {
+            return 100;
+        }
+        return Double.valueOf(progress.intValue() * 100.0 / total.intValue()).intValue();
     }
 
     private transient final Runnable computeDiskUsage = new Runnable() {

@@ -24,7 +24,7 @@
 
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core">
+<j:jelly xmlns:j="jelly:core" xmlns:t="/lib/hudson">
     <p>
         <j:choose>
             <j:when test="${it.lastRunStart == 0}">
@@ -35,7 +35,7 @@
                 <strong>Update in progress</strong>, please
                 <a href=".">try again in a short while</a>
                 <br/>
-                <progress value="${it.progress}" max="${it.itemsCount}"/>
+                <t:progressBar pos="${it.progress}" animate="true" large="true"/>
                 <br/>
             </j:when>
             <j:otherwise>
