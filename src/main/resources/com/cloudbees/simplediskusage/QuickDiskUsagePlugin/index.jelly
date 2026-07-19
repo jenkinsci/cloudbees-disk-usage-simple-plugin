@@ -39,7 +39,7 @@
             <thead>
                 <tr>
                     <th initialSortDir="down">${%item_name}</th>
-                    <th style="text-align: right" >${%disk_usage} (MB)</th>
+                    <th style="text-align: right" >${%disk_usage}</th>
                     <th style="text-align: right" >${%files}</th>
                     <th class="jenkins-table__cell--tight" data-sort-disable="true">${%Action}</th>
                 </tr>
