@@ -25,85 +25,78 @@
 -->
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:s="/lib/form">
-    <l:layout title="${%disk_usage}" permission="${app.SYSTEM_READ}">
-        <l:breadcrumb title="${%disk_usage}" href="."/>
-        <st:include page="sidepanel.jelly" />
-        <l:main-panel>
-            <div class="jenkins-app-bar">
-                <div class="jenkins-app-bar__content">
-                    <h1>
-                        ${%disk_usage}
-                    </h1>
-                </div>
-            </div>
-            <st:include page="message.jelly" />
-            <l:tabBar>
-                <l:tab name="${%Jobs}" active="true" href="."/>
-                <l:tab name="${%Directories}" href="./directories"/>
-            </l:tabBar>
-            <table class="jenkins-table sortable">
-                <thead>
-                    <tr>
-                        <th initialSortDir="down">${%item_name}</th>
-                        <th style="text-align: right" >${%disk_usage}</th>
-                        <th style="text-align: right" >${%files}</th>
-                        <th class="jenkins-table__cell--tight" data-sort-disable="true">${%Action}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <j:forEach var="e" items="${it.jobsUsages}">
-                        <j:if test="${e.usage != 0}">
-                            <tr>
-                                <td>
-                                    <a href="${rootURL}/${e.url}" class="jenkins-table__link model-link inside">${e.displayName}</a>
-                                </td>
-                                <td style="text-align: right" data="${e.usage}">
-                                    <j:choose>
-                                        <j:when test="${e.usage > 0}"><code>${e.usageFormatted}</code></j:when>
-                                        <j:otherwise>N/A</j:otherwise>
-                                    </j:choose>
-                                </td>
-                                <td style="text-align: right" data="${e.count}">
-                                    <j:choose>
-                                        <j:when test="${e.count > 0}"><code>${e.count}</code></j:when>
-                                        <j:otherwise>N/A</j:otherwise>
-                                    </j:choose>
-                                </td>
-                                <td>
-                                    <s:link href="clean/?job=${e.fullName}" post="true" clazz="jenkins-table__link">cleanup</s:link>
-                                </td>
-                            </tr>
-                        </j:if>
-                    </j:forEach>
-                </tbody>
-            </table>
-            <div style="padding:10px; margin-top: 10px;">
-                <h4>Background</h4>
-                <p>
-                    Large amounts of disk are typically consumed by a job's build history as each entry in the build history will have an archived
-                    copy of the build artifacts. 
-                </p>
-                
-                <p> 
-                    e.g. A 100MB WAR file is archived and 30 builds are retained in the build history - this will result in 3GB of
-                    usage for a single Jenkins job.  By default builds are retained forever - thus the storage requirement for the Jenkins controller is unbounded.
-                </p>
+    <j:set var="header">
+        <st:include page="header.jelly" />
+    </j:set>
 
-                <h4>Limiting Disk Usage</h4>
-                <p>
-                    Jobs can be configured with "<em>Discard Old Builds</em>" option to only keep X builds in history
-                    (or to only keep them for a maximum of N days).
-                </p>
-                
-                <p>
-                    A better option is to open the <em>Advanced</em> section for the "<em>Discard Old Builds</em>" option
-                    and to configure "<em>Max # of builds to keep with artifacts</em>".
-                </p>
-                <p>
-                    The 'run cleanup' link in the above job list will instruct
-                    Jenkins to cleanup the build history as per the configuration.
-                </p>
-            </div>
-        </l:main-panel>
-    </l:layout>
+    <l:settings-subpage permission="${app.SYSTEM_READ}" header="${header}" title="${%Disk Usage Jobs}">
+        <st:include page="message.jelly" />
+        <l:tabBar>
+            <l:tab name="${%Jobs}" active="true" href="."/>
+            <l:tab name="${%Directories}" href="./directories"/>
+        </l:tabBar>
+        <table class="jenkins-table sortable">
+            <thead>
+                <tr>
+                    <th initialSortDir="down">${%item_name}</th>
+                    <th style="text-align: right" >${%disk_usage}</th>
+                    <th style="text-align: right" >${%files}</th>
+                    <th class="jenkins-table__cell--tight" data-sort-disable="true">${%Action}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <j:forEach var="e" items="${it.jobsUsages}">
+                    <j:if test="${e.usage != 0}">
+                        <tr>
+                            <td>
+                                <a href="${rootURL}/${e.url}" class="jenkins-table__link model-link inside">${e.displayName}</a>
+                            </td>
+                            <td style="text-align: right" data="${e.usage}">
+                                <j:choose>
+                                    <j:when test="${e.usage > 0}"><code>${e.usageFormatted}</code></j:when>
+                                    <j:otherwise>N/A</j:otherwise>
+                                </j:choose>
+                            </td>
+                            <td style="text-align: right" data="${e.count}">
+                                <j:choose>
+                                    <j:when test="${e.count > 0}"><code>${e.count}</code></j:when>
+                                    <j:otherwise>N/A</j:otherwise>
+                                </j:choose>
+                            </td>
+                            <td>
+                                <s:link href="clean/?job=${e.fullName}" post="true" clazz="jenkins-table__link">cleanup</s:link>
+                            </td>
+                        </tr>
+                    </j:if>
+                </j:forEach>
+            </tbody>
+        </table>
+        <div class="jenkins-!-margin-top-1 jenkins-!-padding-1">
+            <h4>Background</h4>
+            <p>
+                Large amounts of disk are typically consumed by a job's build history as each entry in the build history will have an archived
+                copy of the build artifacts.
+            </p>
+
+            <p>
+                e.g. A 100MiB WAR file is archived and 30 builds are retained in the build history - this will result in 3GiB of
+                usage for a single Jenkins job.  By default builds are retained forever - thus the storage requirement for the Jenkins controller is unbounded.
+            </p>
+
+            <h4>Limiting Disk Usage</h4>
+            <p>
+                Jobs can be configured with "<em>Discard Old Builds</em>" option to only keep X builds in history
+                (or to only keep them for a maximum of N days).
+            </p>
+
+            <p>
+                A better option is to open the <em>Advanced</em> section for the "<em>Discard Old Builds</em>" option
+                and to configure "<em>Max # of builds to keep with artifacts</em>".
+            </p>
+            <p>
+                The 'run cleanup' link in the above job list will instruct
+                Jenkins to cleanup the build history as per the configuration.
+            </p>
+        </div>
+    </l:settings-subpage>
 </j:jelly>

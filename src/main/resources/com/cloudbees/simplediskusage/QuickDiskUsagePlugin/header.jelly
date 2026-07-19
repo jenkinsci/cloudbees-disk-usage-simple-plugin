@@ -1,0 +1,12 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:l="/lib/layout" xmlns:s="/lib/form">
+    <l:view>
+        <st:adjunct includes="com.cloudbees.simplediskusage.QuickDiskUsagePlugin.refresh-disk-usage"/>
+        <l:app-bar title="${%Disk Usage}">
+            <button class="jenkins-button jenkins-button--primary" id="refresh-disk-usage">
+                <l:icon src="symbol-refresh"/>
+                ${%Refresh}
+            </button>
+        </l:app-bar>
+    </l:view>
+</j:jelly>
