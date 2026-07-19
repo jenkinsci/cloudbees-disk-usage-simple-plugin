@@ -23,7 +23,6 @@
  */
 package com.cloudbees.simplediskusage;
 
-import hudson.Functions;
 import java.text.DecimalFormat;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
