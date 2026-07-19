@@ -57,13 +57,13 @@
                                 <td>
                                     <a href="${rootURL}/${e.url}" class="jenkins-table__link model-link inside">${e.displayName}</a>
                                 </td>
-                                <td style="text-align: right">
+                                <td style="text-align: right" data="${e.usage}">
                                     <j:choose>
                                         <j:when test="${e.usage > 0}"><code>${e.usageInMB}</code></j:when>
                                         <j:otherwise>N/A</j:otherwise>
                                     </j:choose>
                                 </td>
-                                <td style="text-align: right">
+                                <td style="text-align: right" data="${e.count}">
                                     <j:choose>
                                         <j:when test="${e.count > 0}"><code>${e.count}</code></j:when>
                                         <j:otherwise>N/A</j:otherwise>
