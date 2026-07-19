@@ -23,6 +23,7 @@
  */
 package com.cloudbees.simplediskusage;
 
+import java.text.DecimalFormat;
 import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
@@ -85,6 +86,26 @@ public class DiskItem implements Comparable<DiskItem> {
     public String getUsageInMB() {
         float mbValue = usage / 1024.0f;
         return String.format("%.1f", mbValue);
+    }
+
+    public String getUsageFormatted() {
+        String measure = "KiB";
+        if (usage < 1024) {
+            return usage + " " + measure;
+        }
+        double number = usage;
+        number = number / 1024;
+        measure = "MiB";
+        if (number >= 1024) {
+            number = number / 1024;
+            measure = "GiB";
+            if (number >= 1024) {
+                number = number / 1024;
+                measure = "TiB";
+            }
+        }
+        DecimalFormat format = new DecimalFormat("#0.0");
+        return format.format(number) + " " + measure;
     }
 
     @Override

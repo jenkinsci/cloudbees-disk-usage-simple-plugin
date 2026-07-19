@@ -39,7 +39,7 @@
             <thead>
                 <tr>
                     <th initialSortDir="down">${%item_name}</th>
-                    <th style="text-align: right">${%disk_usage} (MB)</th>
+                    <th style="text-align: right">${%disk_usage}</th>
                     <th style="text-align: right">${%files}</th>
                 </tr>
             </thead>
@@ -48,13 +48,13 @@
                     <j:if test="${e.usage != 0}">
                         <tr>
                             <td>${e.displayName}</td>
-                            <td style="text-align: right">
+                            <td style="text-align: right" data="${e.usage}">
                                 <j:choose>
-                                    <j:when test="${e.usage > 0}">${e.usageInMB}</j:when>
+                                    <j:when test="${e.usage > 0}">${e.usageFormatted}</j:when>
                                     <j:otherwise>N/A</j:otherwise>
                                 </j:choose>
                             </td>
-                            <td style="text-align: right">
+                            <td style="text-align: right" data="${e.count}">
                                 <j:choose>
                                     <j:when test="${e.count > 0}">${e.count}</j:when>
                                     <j:otherwise>N/A</j:otherwise>
