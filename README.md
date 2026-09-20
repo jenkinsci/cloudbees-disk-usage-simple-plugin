@@ -15,6 +15,3 @@ Simple disk usage plugin that calculates disk usage while limiting the performan
 * a refresh of usage data can be manually requested, but only one at a time will occur
 
 To use this plugin visit the `Manage Jenkins` -> `Disk usage` page.
-
-# Resources
-* Issues Tracking: [Jira](https://issues.jenkins-ci.org/issues/?jql=project+%3D+JENKINS+AND+component+%3D+cloudbees-disk-usage-simple-plugin)
